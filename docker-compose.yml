@@ -1,0 +1,68 @@
+services:
+  # Data Base
+  mongodb:
+    image: mongo:latest
+    container_name: borsch_db
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+
+  # UI for DB (http://localhost:8081)
+  mongo-express:
+    image: mongo-express
+    container_name: borsch_db_ui
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_EXPRESS_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_EXPRESS_PASS}
+      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_USER}:${MONGO_PASS}@mongodb:${MONGO_PORT}/
+    depends_on:
+      - mongodb
+
+  # Main Backend (FastAPI)
+  backend:
+    build: ./backend
+    container_name: borsch_api
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - AI_SERVICE_URL=http://ai_service:8000
+    depends_on:
+      - mongodb
+      - ai_service
+
+  # AI Module (Computer Vision & RecSys)
+  ai_service:
+    build: ./ai_module
+    container_name: borsch_ai
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./ai_module:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Next.js Frontend
+  frontend:
+    build: ./frontend
+    container_name: borsch_web
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
