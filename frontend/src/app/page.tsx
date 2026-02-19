@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import styles from './page.module.css';
+import { Button } from './components/ui/Button/Button';
 
 export default function Home() {
   return (
@@ -59,6 +60,88 @@ export default function Home() {
           >
             Documentation
           </a>
+          <div style={{ padding: 40, display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button variant="primary" size="sm">
+                Primary SM
+              </Button>
+              <Button variant="primary" size="md">
+                Primary MD
+              </Button>
+              <Button variant="primary" size="lg">
+                Primary LG
+              </Button>
+              <Button variant="primary" disabled>
+                Disabled
+              </Button>
+              <Button variant="primary" loading>
+                Loading
+              </Button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button variant="secondary" size="sm">
+                Secondary SM
+              </Button>
+              <Button variant="secondary" size="md">
+                Secondary MD
+              </Button>
+              <Button variant="secondary" size="lg">
+                Secondary LG
+              </Button>
+              <Button variant="secondary" disabled>
+                Disabled
+              </Button>
+              <Button variant="secondary" loading>
+                Loading
+              </Button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button variant="ghost" size="sm">
+                Ghost SM
+              </Button>
+              <Button variant="ghost" size="md">
+                Ghost MD
+              </Button>
+              <Button variant="ghost" size="lg">
+                Ghost LG
+              </Button>
+              <Button variant="ghost" disabled>
+                Disabled
+              </Button>
+              <Button variant="ghost" loading>
+                Loading
+              </Button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button variant="danger" size="sm">
+                Danger SM
+              </Button>
+              <Button variant="danger" size="md">
+                Danger MD
+              </Button>
+              <Button variant="danger" size="lg">
+                Danger LG
+              </Button>
+              <Button variant="danger" disabled>
+                Disabled
+              </Button>
+              <Button variant="danger" loading>
+                Loading
+              </Button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button variant="primary" icon="plus">
+                З іконкою зліва
+              </Button>
+              <Button variant="primary" icon="search" iconPosition="right">
+                З іконкою справа
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
     </div>

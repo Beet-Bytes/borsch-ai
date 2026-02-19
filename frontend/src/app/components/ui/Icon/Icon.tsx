@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react';
 import { icons, type IconName } from './icons';
 
-type IconSize = 'sm' | 'md' | 'lg';
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg';
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   name: IconName;
@@ -9,6 +9,7 @@ interface IconProps extends SVGProps<SVGSVGElement> {
 }
 
 const sizeMap: Record<IconSize, number> = {
+  xs: 12,
   sm: 16,
   md: 24,
   lg: 32,
