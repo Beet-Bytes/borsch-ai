@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import styles from './page.module.css';
 import { Button } from './components/ui/Button/Button';
+import { Input } from './components/ui/Input/Input';
 
 export default function Home() {
   return (
@@ -140,6 +141,32 @@ export default function Home() {
               <Button variant="primary" icon="search" iconPosition="right">
                 З іконкою справа
               </Button>
+            </div>
+
+            <div
+              style={{
+                padding: 40,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 24,
+                maxWidth: 400,
+              }}
+            >
+              <Input label="Label" placeholder="Default" leftIcon="search" rightIcon="search" />
+              <Input
+                label="Label"
+                placeholder="Error"
+                leftIcon="search"
+                rightIcon="search"
+                error="Повідомлення про помилку"
+              />
+              <Input
+                label="Label"
+                placeholder="Disabled"
+                leftIcon="search"
+                rightIcon="search"
+                disabled
+              />
             </div>
           </div>
         </div>

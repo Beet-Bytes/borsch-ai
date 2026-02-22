@@ -10,7 +10,7 @@ interface IconProps extends SVGProps<SVGSVGElement> {
 
 const sizeMap: Record<IconSize, number> = {
   xs: 12,
-  sm: 16,
+  sm: 20,
   md: 24,
   lg: 32,
 };
