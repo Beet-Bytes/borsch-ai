@@ -1,9 +1,22 @@
+'use client';
+
 import Image from 'next/image';
 import styles from './page.module.css';
 import { Button } from './components/ui/Button/Button';
 import { Input } from './components/ui/Input/Input';
+import { useState } from 'react';
+import { Select } from './components/ui/Select/Select';
 
 export default function Home() {
+  const [diet, setDiet] = useState<string | null>(null);
+
+  const dietOptions = [
+    { label: 'Vegan', value: 'vegan' },
+    { label: 'Vegetarian', value: 'vegetarian' },
+    { label: 'Keto', value: 'keto' },
+    { label: 'Gluten-Free', value: 'gluten-free' },
+    { label: 'No preference', value: 'none' },
+  ];
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -167,6 +180,28 @@ export default function Home() {
                 rightIcon="search"
                 disabled
               />
+            </div>
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+              <div style={{ width: 260 }}>
+                <Select
+                  label="Label"
+                  options={dietOptions}
+                  value={diet}
+                  onChange={(val) => setDiet(val)}
+                  placeholder="Focused"
+                />
+              </div>
+
+              <div style={{ width: 260 }}>
+                <Select
+                  label="Label (disabled)"
+                  options={dietOptions}
+                  value={null}
+                  onChange={() => {}}
+                  placeholder="Disabled"
+                  disabled
+                />
+              </div>
             </div>
           </div>
         </div>
