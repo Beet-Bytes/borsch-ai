@@ -8,10 +8,10 @@
 /* Label */
 .label {
   font-family: var(--font-outfit), var(--font-family);
-  font-size: 14px;
-  font-weight: var(--font-weight-regular);
-  line-height: 21px;
-  color: var(--color-neutral-300);
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  line-height: 18px;
+  color: #cbc4d2;
   transition: color 0.15s ease;
 }
 
@@ -32,19 +32,20 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 12px var(--spacing-md);
+  padding: 10px 16px;
   background-color: var(--color-neutral-800);
-  border: 1.5px solid var(--color-neutral-700);
+  border: 1.5px solid var(--color-neutral-500);
   border-radius: var(--radius-full);
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
-  min-height: 48px;
 }
 
 .inputWrapper:focus-within {
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.15);
+  box-shadow:
+    0 0 0 1px var(--color-primary-500),
+    0 0 8px 1px rgba(255, 90, 31, 0.5);
 }
 
 .inputWrapper.error {
@@ -69,10 +70,10 @@
   border: none;
   outline: none;
   font-family: var(--font-outfit), var(--font-family);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: var(--font-weight-regular);
-  line-height: 21px;
-  color: var(--color-neutral-50);
+  line-height: 20px;
+  color: var(--color-neutral-100);
   width: 100%;
   min-width: 0;
 }
