@@ -9,7 +9,7 @@ body {
 
 body {
   font-family: var(--font-outfit), var(--font-family);
-  background: var(--color-neutral-900);
+  background: var(--color-neutral-1000);
   color: var(--text-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

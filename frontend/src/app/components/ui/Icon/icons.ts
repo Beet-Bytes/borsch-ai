@@ -1,4 +1,5 @@
 import AiIcon from '@/app/assets/icons/ai.svg';
+import ArrowRightIcon from '@/app/assets/icons/arrow-right.svg';
 import ChevronDownIcon from '@/app/assets/icons/chevron-down.svg';
 import ChevronUpIcon from '@/app/assets/icons/chevron-up.svg';
 import ErrorIcon from '@/app/assets/icons/error.svg';
@@ -29,6 +30,7 @@ import CheckIcon from '@/app/assets/icons/check.svg';
 
 export const icons = {
   ai: AiIcon,
+  'arrow-right': ArrowRightIcon,
   'chevron-down': ChevronDownIcon,
   'chevron-up': ChevronUpIcon,
   error: ErrorIcon,

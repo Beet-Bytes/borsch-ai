@@ -5,7 +5,8 @@
   right: 0;
   z-index: 50;
   height: 64px;
-  background-color: rgba(20, 20, 20, 0.75);
+  background-color: var(--color-neutral-800);
+  background-color: rgba(30, 30, 30, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
