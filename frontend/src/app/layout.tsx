@@ -26,7 +26,7 @@ export default function RootLayout({
         <Navbar
           logo={
             <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-neutral-50)' }}>
-              Borsch<span style={{ color: 'var(--color-primary-500)' }}>AI</span>
+              <span style={{ color: 'var(--color-primary-500)' }}>AI</span>-Borsch
             </span>
           }
           actions={

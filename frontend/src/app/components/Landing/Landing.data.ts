@@ -37,6 +37,37 @@ export const features: Feature[] = [
   },
 ];
 
+export interface Step {
+  number: string;
+  icon: IconName;
+  title: string;
+  description: string;
+}
+
+export const steps: Step[] = [
+  {
+    number: '01',
+    icon: 'make-photo',
+    title: 'Scan your fridge',
+    description:
+      'Take a photo or list what you have. AI-Borsch identifies your ingredients in seconds.',
+  },
+  {
+    number: '02',
+    icon: 'ai',
+    title: 'Get AI recipes',
+    description:
+      'Our AI generates personalized recipes based on exactly what you have, your taste, and dietary needs.',
+  },
+  {
+    number: '03',
+    icon: 'flame',
+    title: 'Cook & track',
+    description:
+      'Follow step-by-step instructions, track calories, and build better eating habits over time.',
+  },
+];
+
 export const stats: Stat[] = [
   { value: '2k+', label: 'Recipes' },
   { value: '40%', label: 'Less Waste' },
