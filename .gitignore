@@ -16,3 +16,8 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+#data for model training (2 GB)
+/ai_module/data/
+/.venv/
+*.pt
