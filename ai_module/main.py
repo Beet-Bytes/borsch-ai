@@ -1,11 +1,12 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-from ultralytics import YOLO
-import cv2
-import numpy as np
 import base64
 import math
 import os
+
+import cv2
+import numpy as np
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+from ultralytics import YOLO
 
 app = FastAPI(title="Borsch AI Vision Service")
 
@@ -13,7 +14,8 @@ app = FastAPI(title="Borsch AI Vision Service")
 try:
     print("[INFO] Initializing YOLO model...")
 
-    # Get the directory where main.py is located and construct the path to fridge_recognition_v0.1.pt
+    # Get the directory where main.py is located
+    # and construct the path to fridge_recognition_v0.1.pt
     current_dir = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(current_dir, "fridge_recognition_v0.1.pt")
 
@@ -51,9 +53,7 @@ async def predict_image(file: UploadFile = File(...)):
 
         if img is None:
             print("[ERROR] Invalid image format received.")
-            return JSONResponse(
-                status_code=400, content={"error": "Invalid image format"}
-            )
+            return JSONResponse(status_code=400, content={"error": "Invalid image format"})
 
         print("[INFO] Image decoded successfully. Running YOLO inference...")
 
@@ -79,9 +79,7 @@ async def predict_image(file: UploadFile = File(...)):
                 current_class = class_names[cls]
 
                 # Add to the list for the backend
-                detected_ingredients.append(
-                    {"ingredient": current_class, "confidence": conf}
-                )
+                detected_ingredients.append({"ingredient": current_class, "confidence": conf})
 
                 # Draw bounding box on the image (for frontend)
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
@@ -109,8 +107,10 @@ async def predict_image(file: UploadFile = File(...)):
         return {
             "status": "success",
             "total_detected": len(detected_ingredients),
-            "ingredients": detected_ingredients,  # This array will go to the DB for recipe search
-            "image_base64": img_base64,  # Frontend will display this to the user
+            # This array will go to the DB for recipe search
+            "ingredients": detected_ingredients,
+            # Frontend will display this to the user
+            "image_base64": img_base64,
         }
 
     except Exception as e:
