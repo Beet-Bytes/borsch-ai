@@ -32,6 +32,9 @@ jobs:
   # Job 2: Check JavaScript (Frontend)
   frontend-linter:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
 
@@ -40,8 +43,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Prettier
-        run: npm install -g prettier
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run Prettier Check
-        run: prettier --check "**/*.{js,jsx,ts,tsx,json,md}"
+        run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,md}"
