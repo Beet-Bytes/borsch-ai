@@ -29,20 +29,10 @@ export default function RootLayout({
               Borsch<span style={{ color: 'var(--color-primary-500)' }}>AI</span>
             </span>
           }
-          navItems={[
-            { label: 'Рецепти', href: '/recipes' },
-            { label: 'Пошук', href: '/search' },
-            { label: 'Про нас', href: '/about' },
-          ]}
           actions={
-            <>
-              <Button variant="ghost" size="sm">
-                Увійти
-              </Button>
-              <Button variant="primary" size="sm">
-                Реєстрація
-              </Button>
-            </>
+            <Button variant="secondary" size="md">
+              Login
+            </Button>
           }
         />
         <main style={{ paddingTop: 64 }}>{children}</main>

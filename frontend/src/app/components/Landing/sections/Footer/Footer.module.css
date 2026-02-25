@@ -1,0 +1,11 @@
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+}
+
+.footerText {
+  font-size: 14px;
+  color: var(--text-caption);
+  margin: 0;
+}
