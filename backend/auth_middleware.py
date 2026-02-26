@@ -20,7 +20,7 @@ ISSUER = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{USER_POOL_ID}"
 try:
     jwks = requests.get(JWKS_URL).json()
 except Exception as e:
-    print(f"Помилка завантаження JWKS: {e}")
+    print(f"JWKS loading error: {e}")
     jwks = {"keys": []}
 
 security = HTTPBearer()
@@ -52,11 +52,11 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
         )
 
         if payload.get("client_id") != CLIENT_ID and payload.get("aud") != CLIENT_ID:
-            raise HTTPException(status_code=401, detail="Токен виданий для іншого додатку")
+            raise HTTPException(status_code=401, detail="Token issued for another application")
 
         return payload["sub"]
 
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Термін дії токена закінчився")
+        raise HTTPException(status_code=401, detail="The token has expired")
     except jwt.InvalidTokenError as e:
-        raise HTTPException(status_code=401, detail=f"Недійсний токен: {str(e)}")
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")

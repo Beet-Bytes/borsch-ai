@@ -42,4 +42,4 @@ def authenticate_user(email: str, password: str):
         )
         return response["AuthenticationResult"]
     except ClientError as e:
-        raise HTTPException(status_code=401, detail="Невірний email або пароль")
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
