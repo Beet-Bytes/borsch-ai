@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from datetime import date, datetime
+
 from database import db
+from fastapi import FastAPI
 from schemas import UserProfileUpdate
-from datetime import datetime, date
 
 app = FastAPI(title="AI Borsch API")
 
