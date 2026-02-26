@@ -24,14 +24,16 @@ export function Hero() {
           and reduce food waste — all in one place.
         </p>
         <div className={styles.heroActions}>
-          <Link href="/recipes">
+          <Link href="/register">
             <Button variant="primary" size="lg" icon="arrow-right" iconPosition="right">
               Try for free
             </Button>
           </Link>
-          <Button variant="ghost" size="lg">
-            Sign in
-          </Button>
+          <Link href="/login">
+            <Button variant="ghost" size="lg">
+              Sign in
+            </Button>
+          </Link>
         </div>
         <div className={styles.stats}>
           {stats.map((stat) => (

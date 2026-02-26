@@ -1,0 +1,39 @@
+.main {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.curvedLoopTop {
+  position: fixed;
+  top: 64px;
+  right: -15%;
+  width: 60%;
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(6deg);
+}
+
+.curvedLoopBottom {
+  position: fixed;
+  bottom: -10px;
+  left: -15%;
+  width: 60%;
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(6deg);
+}
+
+.navLink {
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.navLinkAccent {
+  color: var(--color-primary-500);
+  font-weight: 500;
+}

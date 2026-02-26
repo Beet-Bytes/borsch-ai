@@ -1,0 +1,53 @@
+.card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-heading);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--color-error);
+  margin: -4px 0;
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.link {
+  color: var(--color-primary-500);
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
