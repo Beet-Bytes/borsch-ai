@@ -7,7 +7,8 @@ export interface Feature {
 }
 
 export interface Stat {
-  value: string;
+  to: number;
+  suffix: string;
   label: string;
 }
 
@@ -69,7 +70,7 @@ export const steps: Step[] = [
 ];
 
 export const stats: Stat[] = [
-  { value: '2k+', label: 'Recipes' },
-  { value: '40%', label: 'Less Waste' },
-  { value: '5 min', label: 'Avg Cook Time' },
+  { to: 1500, suffix: '+', label: 'Recipes' },
+  { to: 40, suffix: '%', label: 'Less Waste' },
+  { to: 5, suffix: ' min', label: 'Avg Cook Time' },
 ];
