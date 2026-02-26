@@ -6,3 +6,4 @@ motor
 python-dotenv
 python-jose[cryptography]
 boto3
+bson
