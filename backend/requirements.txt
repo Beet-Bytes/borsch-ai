@@ -9,3 +9,4 @@ boto3
 PyJWT
 cryptography
 requests
+email-validator

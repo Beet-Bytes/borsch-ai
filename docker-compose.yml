@@ -17,8 +17,9 @@ services:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./backend:/app
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
       - AI_SERVICE_URL=http://ai_service:8000
     depends_on:
       - ai_service
