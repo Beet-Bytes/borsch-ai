@@ -1,11 +1,11 @@
 from datetime import date, datetime
 
-from database import db
-from fastapi import FastAPI, Depends
-from schemas import UserProfileUpdate
-from auth_schemas import RegisterRequest, ConfirmRequest, LoginRequest
-from auth_service import sign_up_user, confirm_user, authenticate_user
 from auth_middleware import get_current_user
+from auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest
+from auth_service import authenticate_user, confirm_user, sign_up_user
+from database import db
+from fastapi import Depends, FastAPI
+from schemas import UserProfileUpdate
 
 app = FastAPI(title="AI Borsch API")
 

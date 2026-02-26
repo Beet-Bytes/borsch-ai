@@ -1,8 +1,9 @@
 import os
+
 import boto3
 from botocore.exceptions import ClientError
-from fastapi import HTTPException
 from dotenv import load_dotenv
+from fastapi import HTTPException
 
 load_dotenv()
 
@@ -41,5 +42,5 @@ def authenticate_user(email: str, password: str):
             AuthParameters={"USERNAME": email, "PASSWORD": password},
         )
         return response["AuthenticationResult"]
-    except ClientError as e:
+    except ClientError:
         raise HTTPException(status_code=401, detail="Incorrect email or password")
