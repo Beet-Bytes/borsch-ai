@@ -44,7 +44,9 @@ class MLVectorSchema(BaseModel):
     historical_vegan_rate: Optional[float] = None
     preferred_macros: Optional[PreferredMacrosSchema] = None
     taste_preferences: Optional[TastePreferencesSchema] = None
-    cuisine_preferences: Dict[str, float] = Field(default_factory=dict)
+    cuisine_preferences: Dict[str, float] = Field(
+        default_factory=dict, json_schema_extra={"example": {"ukrainian": 0.9}}
+    )
     novelty_seeking_index: float = 0
     total_recipes_cooked: int = 0
 
