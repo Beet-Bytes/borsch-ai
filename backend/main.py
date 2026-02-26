@@ -5,9 +5,18 @@ from auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest
 from auth_service import authenticate_user, confirm_user, sign_up_user
 from database import db
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from schemas import UserProfileUpdate
 
 app = FastAPI(title="AI Borsch API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
