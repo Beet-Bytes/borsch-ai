@@ -53,21 +53,40 @@ def login(request: LoginRequest):
     }
 
 
-@app.put("/profile")
-async def update_profile(data: UserProfileUpdate, user_id: str = Depends(get_current_user)):
-    profile_data = data.profile.model_dump(exclude_unset=True)
-    update_query = {}
+def flatten_dict(d, prefix=""):
+    items = []
+    for k, v in d.items():
+        new_key = f"{prefix}.{k}" if prefix else k
 
-    for k, v in profile_data.items():
         if isinstance(v, date) and not isinstance(v, datetime):
             v = datetime.combine(v, datetime.min.time())
-        update_query[f"profile.{k}"] = v
 
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
+
+@app.put("/profile")
+async def update_profile(data: UserProfileUpdate, user_id: str = Depends(get_current_user)):
+    raw_data = data.model_dump(exclude_unset=True)
+
+    for field in ["email", "password_hash", "role"]:
+        raw_data.pop(field, None)
+
+    update_query = flatten_dict(raw_data)
     update_query["updated_at"] = datetime.utcnow()
 
-    await db.user.update_one({"user_id": user_id}, {"$set": update_query}, upsert=True)
+    search_filter = {"user_id": user_id}
 
-    return {"status": "success", "updated_fields": list(update_query.keys()), "user_id": user_id}
+    result = await db.user.update_one(search_filter, {"$set": update_query}, upsert=True)
+
+    return {
+        "status": "success",
+        "updated_fields": list(update_query.keys()),
+        "matched_count": result.matched_count,
+    }
 
 
 @app.get("/profile")
