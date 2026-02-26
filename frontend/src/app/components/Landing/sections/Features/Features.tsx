@@ -32,7 +32,7 @@ export function Features() {
           ))}
         </div>
 
-        <Link href="/recipes">
+        <Link href="/register">
           <Button variant="primary" size="lg" icon="arrow-right" iconPosition="right">
             Get started — it&apos;s free
           </Button>

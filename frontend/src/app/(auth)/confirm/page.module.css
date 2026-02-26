@@ -1,0 +1,66 @@
+.card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-heading);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-body);
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.codeRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.digitInput {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-heading);
+  background: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-700);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: var(--font-outfit), sans-serif;
+}
+
+.digitInput:focus {
+  border-color: var(--color-primary-500);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--color-error);
+  text-align: center;
+  margin: -4px 0;
+}

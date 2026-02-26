@@ -1,0 +1,44 @@
+.root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.35;
+}
+
+.orbOrange {
+  width: 500px;
+  height: 500px;
+  background: var(--color-primary-500);
+  top: -120px;
+  left: -100px;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+.orbOrangeRight {
+  width: 420px;
+  height: 420px;
+  background: var(--color-primary-500);
+  bottom: -100px;
+  right: -80px;
+  animation: pulse 10s ease-in-out infinite reverse;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.25;
+  }
+}
