@@ -17,7 +17,7 @@ try:
     # Get the directory where main.py is located
     # and construct the path to fridge_recognition_v0.1.pt
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(current_dir, "fridge_recognition_v0.1.pt")
+    model_path = os.path.join(current_dir, "models", "fridge_recognition_v0.1.pt")
 
     model = YOLO(model_path)
     class_names = model.names

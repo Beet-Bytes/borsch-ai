@@ -10,3 +10,5 @@ PyJWT
 cryptography
 requests
 email-validator
+httpx
+python-multipart
