@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Header, Response, status
+from fastapi import APIRouter, Header, Response
 
 from app.database import db
 from app.user.authorization.auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest

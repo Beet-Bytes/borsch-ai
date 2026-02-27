@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from app.user.authorization.auth_service import AuthService
 
 load_dotenv()
