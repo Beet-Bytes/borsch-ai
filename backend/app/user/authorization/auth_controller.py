@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Header, Response
+from fastapi import APIRouter, Header, HTTPException, Response
 
 from app.database import db
 from app.user.authorization.auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest
@@ -12,12 +12,16 @@ auth_service = AuthService()
 
 @router.post("/register")
 async def register(request: RegisterRequest):
+    if not request.agreed_to_terms:
+        raise HTTPException(status_code=400, detail="You must agree to Terms & Privacy")
     user_sub = auth_service.sign_up_user(request.email, request.password)
 
     new_user = {
         "user_id": user_sub,
         "email": request.email,
         "role": "user",
+        "agreed_to_terms": True,
+        "agreed_to_terms_at": datetime.utcnow(),
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow(),
     }
