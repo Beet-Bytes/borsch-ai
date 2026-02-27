@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 
 from app.user.authorization.auth_middleware import get_current_user
-from app.user.user_schemas import UserProfileUpdate
 from app.user.profile.profile_service import (
-    update_user_profile,
     get_user_profile,
+    update_user_profile,
 )
+from app.user.user_schemas import UserProfileUpdate
 
 router = APIRouter(tags=["Profile"])
 
