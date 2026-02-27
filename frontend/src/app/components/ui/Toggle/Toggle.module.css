@@ -1,0 +1,61 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: var(--radius-full);
+}
+
+.track {
+  position: relative;
+  width: 96px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-500);
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.trackOnEnabled {
+  background: var(--color-primary-500);
+}
+
+.trackDisabledOn {
+  background: #8c3a1c;
+}
+
+.trackDisabledOff {
+  background: var(--color-neutral-700);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: #fafafa;
+  transform: translate(0, -50%);
+  transition: transform 0.18s ease;
+}
+
+.thumbOn {
+  transform: translate(48px, -50%);
+}
+
+.thumbOffEnabled {
+  background: #fafafa;
+}
+
+.thumbDisabled {
+  background: #fafafa80;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}

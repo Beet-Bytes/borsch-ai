@@ -1,0 +1,99 @@
+:root {
+  --font-family: 'Outfit', sans-serif;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Text colors */
+  --text-heading: var(--color-neutral-50);
+  --text-subheading: #e5e5e5;
+  --text-body: var(--color-neutral-300);
+  --text-caption: var(--color-neutral-400);
+  --text-overline: var(--color-neutral-500);
+  --text-button: #ffffff;
+}
+
+/* H1 */
+.h1 {
+  font-size: 40px;
+  font-weight: var(--font-weight-bold);
+  line-height: 46px;
+  color: var(--text-heading);
+}
+
+/* H2 */
+.h2 {
+  font-size: 30px;
+  font-weight: var(--font-weight-bold);
+  line-height: 36px;
+  color: var(--text-heading);
+}
+
+/* H3 */
+.h3 {
+  font-size: 22px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 28px;
+  color: var(--text-heading);
+}
+
+/* H4 */
+.h4 {
+  font-size: 17px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 24px;
+  color: var(--text-subheading);
+}
+
+/* Body */
+.body {
+  font-size: 15px;
+  font-weight: var(--font-weight-regular);
+  line-height: 24px;
+  color: var(--text-body);
+}
+
+/* Body SM */
+.body-sm {
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  line-height: 21px;
+  color: var(--text-body);
+}
+
+/* Caption */
+.caption {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 17px;
+  color: var(--text-caption);
+}
+
+/* Overline */
+.overline {
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 14px;
+  color: var(--text-overline);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Button */
+.button-text {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 14px;
+  color: var(--text-button);
+}
+
+/* Button SM */
+.button-text-sm {
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 12px;
+  color: var(--text-button);
+}
