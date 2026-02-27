@@ -77,3 +77,52 @@ class UserProfileUpdate(BaseModel):
     subscription: SubscriptionSchema
     created_at: datetime
     updated_at: datetime
+
+
+class UpdateProfileResponse(BaseModel):
+    status: str
+    updated_fields: List[str]
+    matched_count: int
+
+
+class BiometricsSchema2(BaseModel):
+    weight_kg: Optional[float] = Field(None, ge=0, le=620)
+    target_weight: Optional[float] = Field(None, ge=0)
+    height_cm: Optional[float] = Field(None, ge=0, le=280)
+    gender: Optional[str] = None
+    activityLevel: Optional[str] = None
+    goal: Optional[str] = None
+
+
+class ProfileUpdateSchema2(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    birthDate: Optional[date] = None
+    avatar_url: Optional[str] = None
+    locale: Optional[str] = None
+    timezone: Optional[str] = None
+
+
+class MLVectorUpdateSchema2(BaseModel):
+    avg_prep_time_pref: Optional[float] = None
+    avg_difficulty_pref: Optional[float] = None
+    historical_vegan_rate: Optional[float] = None
+    preferred_macros: Optional[PreferredMacrosSchema] = None
+    taste_preferences: Optional[TastePreferencesSchema] = None
+    cuisine_preferences: Optional[Dict[str, float]] = None
+    novelty_seeking_index: Optional[float] = None
+    total_recipes_cooked: Optional[int] = None
+
+
+class SubscriptionUpdateSchema2(BaseModel):
+    plan: Optional[str] = None
+    expires_at: Optional[datetime] = None
+
+
+class UserProfileUpdate2(BaseModel):
+    profile: Optional[ProfileUpdateSchema2] = None
+    biometrics: Optional[BiometricsSchema] = None
+    preferences: Optional[PreferencesSchema] = None
+    hard_constraints: Optional[HardConstraintsSchema] = None
+    ml_vector: Optional[MLVectorUpdateSchema2] = None
+    subscription: Optional[SubscriptionUpdateSchema2] = None
