@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from fastapi import HTTPException
+from pydantic import EmailStr
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 
 
-def sign_up_user(email: str, password: str):
+def sign_up_user(email: EmailStr, password: str):
     try:
         response = cognito_client.sign_up(
             ClientId=CLIENT_ID,
@@ -26,7 +27,7 @@ def sign_up_user(email: str, password: str):
         raise HTTPException(status_code=400, detail=e.response["Error"]["Message"])
 
 
-def confirm_user(email: str, code: str):
+def confirm_user(email: EmailStr, code: str):
     try:
         cognito_client.confirm_sign_up(ClientId=CLIENT_ID, Username=email, ConfirmationCode=code)
         return True
@@ -34,7 +35,7 @@ def confirm_user(email: str, code: str):
         raise HTTPException(status_code=400, detail=e.response["Error"]["Message"])
 
 
-def authenticate_user(email: str, password: str):
+def authenticate_user(email: EmailStr, password: str):
     try:
         response = cognito_client.initiate_auth(
             ClientId=CLIENT_ID,
