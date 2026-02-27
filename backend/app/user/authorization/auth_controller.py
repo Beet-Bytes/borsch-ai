@@ -1,17 +1,18 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Header, Response
 
 from app.database import db
 from app.user.authorization.auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest
-from app.user.authorization.auth_service import authenticate_user, confirm_user, sign_up_user
+from app.user.authorization.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
+auth_service = AuthService()
 
 
 @router.post("/register")
 async def register(request: RegisterRequest):
-    user_sub = sign_up_user(request.email, request.password)
+    user_sub = auth_service.sign_up_user(request.email, request.password)
 
     new_user = {
         "user_id": user_sub,
@@ -31,13 +32,13 @@ async def register(request: RegisterRequest):
 
 @router.post("/confirm")
 def confirm_registration(request: ConfirmRequest):
-    confirm_user(request.email, request.confirmation_code)
+    auth_service.confirm_user(request.email, request.confirmation_code)
     return {"status": "success", "message": "Email successfully confirmed."}
 
 
 @router.post("/login")
 def login(request: LoginRequest):
-    auth_result = authenticate_user(request.email, request.password)
+    auth_result = auth_service.authenticate_user(request.email, request.password)
 
     return {
         "access_token": auth_result["AccessToken"],
@@ -45,3 +46,15 @@ def login(request: LoginRequest):
         "refresh_token": auth_result.get("RefreshToken"),
         "token_type": "Bearer",
     }
+
+
+@router.post("/logout")
+async def logout(response: Response, authorization: str = Header(None)):
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+
+        await auth_service.logout_user(token)
+
+    response.delete_cookie("access_token")
+
+    return {"message": "Successfully logged out local session and Cognito"}

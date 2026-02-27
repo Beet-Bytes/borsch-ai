@@ -3,8 +3,10 @@ import os
 import jwt
 import requests
 from dotenv import load_dotenv
-from fastapi import HTTPException, Security
+from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from app.user.authorization.auth_service import AuthService
 
 load_dotenv()
 
@@ -25,8 +27,10 @@ except Exception as e:
 
 security = HTTPBearer()
 
+auth_service = AuthService()
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
     """
     Checks the JWT token and returns the user_id (sub).
     """
@@ -53,6 +57,16 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
 
         if payload.get("client_id") != CLIENT_ID and payload.get("aud") != CLIENT_ID:
             raise HTTPException(status_code=401, detail="Token issued for another application")
+
+        is_alive = await auth_service.verify_token_alive(token)
+        print(f"DEBUG: Token check for {payload['sub']}: {is_alive}")
+
+        if not is_alive:
+            print("DEBUG: Access DENIED")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked. Please log in again.",
+            )
 
         return payload["sub"]
 
