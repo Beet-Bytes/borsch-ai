@@ -4,6 +4,7 @@ from app.user.authorization.auth_middleware import get_current_user
 from app.user.profile.profile_service import (
     get_user_profile,
     update_user_profile,
+    update_user_profile2,
 )
 from app.user.user_schemas import (
     ProfileSchema,
