@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from app.database import db
+from app.user.user_schemas import UserProfileUpdate2
 
 
 def flatten_dict(d, prefix=""):
@@ -20,7 +21,6 @@ def flatten_dict(d, prefix=""):
 
 
 async def update_user_profile(user_id: str, raw_data: dict):
-    # запрещенные поля
     for field in ["email", "password_hash", "role"]:
         raw_data.pop(field, None)
 
@@ -47,3 +47,32 @@ async def get_user_profile(user_id: str):
         return {"message": "Profile not found"}
 
     return user
+
+
+async def update_user_profile2(user_id: str, data: UserProfileUpdate2):
+    """
+    Новый сервис для partial update (UserProfileUpdate2)
+    """
+    raw_data = data.model_dump(exclude_unset=True)
+    if not raw_data:
+        return {"status": "success", "updated_fields": [], "matched_count": 0}
+
+    # Убираем запрещённые поля
+    for field in ["email", "password_hash", "role"]:
+        raw_data.pop(field, None)
+
+    # Расплющиваем вложенные словари
+    update_query = flatten_dict(raw_data)
+    update_query["updated_at"] = datetime.utcnow()
+
+    result = await db.user.update_one(
+        {"user_id": user_id},
+        {"$set": update_query},
+        upsert=True,
+    )
+
+    return {
+        "status": "success",
+        "updated_fields": list(update_query.keys()),
+        "matched_count": result.matched_count,
+    }
