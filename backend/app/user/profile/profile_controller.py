@@ -1,4 +1,5 @@
-from datetime import datetime, date
+from datetime import date, datetime
+
 from fastapi import APIRouter, Depends
 
 from app.database import db

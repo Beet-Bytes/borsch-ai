@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.user.authorization.auth_controller import router as auth_router
-from backend.app.user.profile.profile_controller import router as profile_router
+from app.user.authorization.auth_controller import router as auth_router
+from app.user.profile.profile_controller import router as profile_router
 
 app = FastAPI(title="AI Borsch API")
 

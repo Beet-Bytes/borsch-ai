@@ -1,17 +1,10 @@
 from datetime import datetime
+
 from fastapi import APIRouter
 
-from app.user.authorization.auth_schemas import (
-    RegisterRequest,
-    ConfirmRequest,
-    LoginRequest,
-)
-from app.user.authorization.auth_service import (
-    sign_up_user,
-    confirm_user,
-    authenticate_user,
-)
 from app.database import db
+from app.user.authorization.auth_schemas import ConfirmRequest, LoginRequest, RegisterRequest
+from app.user.authorization.auth_service import authenticate_user, confirm_user, sign_up_user
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 

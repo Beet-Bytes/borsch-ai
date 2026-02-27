@@ -1,35 +1,43 @@
 services:
-  # AI Module (Computer Vision & RecSys)
+  # AI Module
   ai_service:
-    build: ./ai_module
+    build:
+      context: ./ai_module
+      dockerfile: Dockerfile
     container_name: borsch_ai
     ports:
       - "8001:8000"
     volumes:
-      - ./ai_module:/app
+      - ./ai_module:/ai_module
+    environment:
+      - PYTHONPATH=/ai_module
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  # Main Backend (FastAPI)
+  # Backend
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: borsch_api
     ports:
-      - "${BACKEND_PORT}:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
     env_file:
       - .env
     environment:
       - AI_SERVICE_URL=http://ai_service:8000
+      - PYTHONPATH=/backend
     depends_on:
       - ai_service
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   # Next.js Frontend
   frontend:
     build: ./frontend
     container_name: borsch_web
     ports:
-      - "${FRONTEND_PORT}:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
