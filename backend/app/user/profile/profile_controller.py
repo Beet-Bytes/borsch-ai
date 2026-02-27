@@ -6,9 +6,9 @@ from app.user.profile.profile_service import (
     update_user_profile,
 )
 from app.user.user_schemas import (
-    UserProfileUpdate,
     ProfileSchema,
     UpdateProfileResponse,
+    UserProfileUpdate,
     UserProfileUpdate2,
 )
 
