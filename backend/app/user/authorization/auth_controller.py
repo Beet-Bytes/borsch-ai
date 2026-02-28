@@ -26,7 +26,7 @@ async def register(request: RegisterRequest):
         "updated_at": datetime.utcnow(),
     }
 
-    await db.user.insert_one(new_user)
+    await db.users.insert_one(new_user)
 
     return {
         "message": "User registered. Check your email for confirmation.",
