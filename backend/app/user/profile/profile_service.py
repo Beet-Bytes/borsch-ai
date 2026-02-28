@@ -27,7 +27,7 @@ async def update_user_profile(user_id: str, raw_data: dict):
     update_query = flatten_dict(raw_data)
     update_query["updated_at"] = datetime.utcnow()
 
-    result = await db.user.update_one(
+    result = await db.users.update_one(
         {"user_id": user_id},
         {"$set": update_query},
         upsert=True,
@@ -41,7 +41,7 @@ async def update_user_profile(user_id: str, raw_data: dict):
 
 
 async def get_user_profile(user_id: str):
-    user = await db.user.find_one({"user_id": user_id}, {"_id": 0})
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
 
     if not user:
         return {"message": "Profile not found"}
@@ -65,7 +65,7 @@ async def update_user_profile2(user_id: str, data: UserProfileUpdate2):
     update_query = flatten_dict(raw_data)
     update_query["updated_at"] = datetime.utcnow()
 
-    result = await db.user.update_one(
+    result = await db.users.update_one(
         {"user_id": user_id},
         {"$set": update_query},
         upsert=True,
