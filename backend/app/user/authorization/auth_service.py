@@ -8,12 +8,14 @@ from pydantic import EmailStr
 
 load_dotenv()
 
+# -------------------- Конфігурація Cognito --------------------
 COGNITO_REGION = os.getenv("AWS_REGION")
 CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
 
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 
 
+# -------------------- Сервіс авторизації --------------------
 class AuthService:
     def sign_up_user(self, email: EmailStr, password: str):
         try:
