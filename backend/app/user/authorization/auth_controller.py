@@ -124,15 +124,19 @@ def confirm_registration(request: ConfirmRequest):
         },
     },
 )
-def login(request: LoginRequest):
+def login(request: LoginRequest, response: Response):
     auth_result = auth_service.authenticate_user(request.email, request.password)
 
-    return {
-        "access_token": auth_result["AccessToken"],
-        "id_token": auth_result["IdToken"],
-        "refresh_token": auth_result.get("RefreshToken"),
-        "token_type": "Bearer",
-    }
+    response.set_cookie(
+        key="access_token",
+        value=auth_result["AccessToken"],
+        httponly=True,
+        secure=False,  # TODO: when we set our product in production, set secure to True
+        samesite="lax",  # TODO: opt set samesite to strict
+        max_age=3600,
+    )
+
+    return {"message": "Login successful"}
 
 
 # -------------------- POST /auth/logout --------------------
