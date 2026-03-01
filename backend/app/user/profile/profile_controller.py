@@ -7,7 +7,6 @@ from app.user.profile.profile_service import (
     update_user_profile_optional,
 )
 from app.user.user_schemas import (
-    ProfileSchema,
     UpdateProfileResponse,
     UserProfileUpdate,
     UserProfileUpdateOptional,
