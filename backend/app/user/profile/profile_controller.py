@@ -148,4 +148,6 @@ async def update_profile_optional(
     },
 )
 async def get_profile(user_id: str = Depends(get_current_user)):
-    return await get_user_profile(user_id)
+    full_user = await get_user_profile(user_id)
+
+    return full_user["profile"]

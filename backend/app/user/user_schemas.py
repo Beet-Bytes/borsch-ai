@@ -131,3 +131,20 @@ class UserProfileUpdateOptional(BaseModel):
     hard_constraints: Optional[HardConstraintsSchema] = None
     ml_vector: Optional[MLVectorUpdateSchemaOptional] = None
     subscription: Optional[SubscriptionUpdateSchemaOptional] = None
+
+
+# -------------------- Відповідь: Повний профіль користувача (GET) --------------------
+class UserResponseSchema(BaseModel):
+    user_id: str
+    email: str
+    role: str
+    created_at: datetime
+    updated_at: datetime
+
+    # Вкладені об'єкти використовують ваші існуючі схеми!
+    profile: ProfileSchema
+    biometrics: BiometricsSchema
+    preferences: PreferencesSchema
+    hard_constraints: HardConstraintsSchema
+    ml_vector: MLVectorSchema
+    subscription: SubscriptionSchema
