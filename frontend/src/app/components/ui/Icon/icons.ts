@@ -27,6 +27,7 @@ import SunIcon from '@/app/assets/icons/sun.svg';
 import WarningIcon from '@/app/assets/icons/warning.svg';
 import XIcon from '@/app/assets/icons/x.svg';
 import CheckIcon from '@/app/assets/icons/check.svg';
+import LogoIcon from '@/app/assets/icons/Logo32X32.svg';
 
 export const icons = {
   ai: AiIcon,
@@ -58,6 +59,7 @@ export const icons = {
   warning: WarningIcon,
   x: XIcon,
   check: CheckIcon,
+  logo: LogoIcon,
 } as const;
 
 export type IconName = keyof typeof icons;

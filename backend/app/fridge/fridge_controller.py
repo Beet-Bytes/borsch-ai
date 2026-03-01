@@ -39,7 +39,7 @@ async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(get_c
     if detected_items:
         ingredient_names = [item["ingredient"] for item in detected_items]
 
-        # await db.user.update_one(
+        # await db.users.update_one(
         #     {"user_id": user_id},
         #     {"$addToSet": {"fridge_items": {"$each": ingredient_names}}}
         # )

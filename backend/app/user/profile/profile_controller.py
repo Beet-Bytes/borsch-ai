@@ -4,27 +4,32 @@ from app.user.authorization.auth_middleware import get_current_user
 from app.user.profile.profile_service import (
     get_user_profile,
     update_user_profile,
-    update_user_profile2,
+    update_user_profile_optional,
 )
 from app.user.user_schemas import (
-    ProfileSchema,
     UpdateProfileResponse,
     UserProfileUpdate,
-    UserProfileUpdate2,
+    UserProfileUpdateOptional,
+    UserResponseSchema,
 )
 
 router = APIRouter(tags=["Profile"])
 
 
+# -------------------- PUT /profile --------------------
+# Оновити повний профіль користувача
 @router.put(
-    "/profile",
+    "/profile/update",
     response_model=UpdateProfileResponse,
-    summary="Оновити профіль користувача",
-    description="Дозволяє оновити дані профілю поточного користувача. "
-    "Заборонено змінювати email, пароль та роль.",
+    summary="Update full user profile",
+    description=(
+        "Updates the full profile of the current user. "
+        "Changing email, password, and role is not allowed. "
+        "All required fields must be provided."
+    ),
     responses={
         200: {
-            "description": "Профіль успішно оновлено",
+            "description": "Profile successfully updated",
             "content": {
                 "application/json": {
                     "example": {
@@ -36,15 +41,15 @@ router = APIRouter(tags=["Profile"])
             },
         },
         400: {
-            "description": "Некоректні дані у запиті",
+            "description": "Invalid input data",
             "content": {"application/json": {"example": {"detail": "Invalid input data"}}},
         },
         401: {
-            "description": "Неавторизований доступ",
+            "description": "Unauthorized access",
             "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
         },
         500: {
-            "description": "Внутрішня помилка сервера",
+            "description": "Internal server error",
             "content": {"application/json": {"example": {"detail": "Internal server error"}}},
         },
     },
@@ -57,55 +62,95 @@ async def update_profile(
     return await update_user_profile(user_id, raw_data)
 
 
-@router.get(
-    "/profile",
-    response_model=ProfileSchema,
-    summary="Отримати профіль користувача",
-    description="Повертає дані профілю поточного користувача, включаючи ім’я, дату народження, локаль та часовий пояс.",
+# -------------------- PUT /profile_optional --------------------
+# Часткове оновлення профілю користувача
+@router.put(
+    "/profile/update_optional",
+    response_model=UpdateProfileResponse,
+    summary="Partially update user profile",
+    description=(
+        "Partially updates the profile of the current user. "
+        "Only the provided fields will be updated. "
+        "Changing email, password, and role is not allowed."
+    ),
     responses={
         200: {
-            "description": "Профіль знайдено",
+            "description": "Profile successfully partially updated",
             "content": {
                 "application/json": {
                     "example": {
-                        "first_name": "Дмитро",
-                        "last_name": "Іванов",
+                        "status": "success",
+                        "updated_fields": ["profile.first_name", "ml_vector.novelty_seeking_index"],
+                        "matched_count": 1,
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid input data",
+            "content": {"application/json": {"example": {"detail": "Invalid input data"}}},
+        },
+        401: {
+            "description": "Unauthorized access",
+            "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
+        },
+        500: {
+            "description": "Internal server error",
+            "content": {"application/json": {"example": {"detail": "Internal server error"}}},
+        },
+    },
+)
+async def update_profile_optional(
+    data: UserProfileUpdateOptional,
+    user_id: str = Depends(get_current_user),
+):
+    return await update_user_profile_optional(user_id, data)
+
+
+# -------------------- GET /profile --------------------
+# Отримати профіль користувача
+@router.get(
+    "/profile",
+    response_model=UserResponseSchema,
+    summary="Get full user profile",
+    description=(
+        "Returns the current user's profile, including first name, last name, "
+        "birth date, avatar URL, locale, and timezone."
+    ),
+    responses={
+        200: {
+            "description": "Profile retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "first_name": "Dmytro",
+                        "last_name": "Ivanov",
                         "birthDate": "1990-05-12",
                         "avatar_url": "https://example.com/avatar.png",
-                        "locale": "uk-UA",
+                        "locale": "en-US",
                         "timezone": "Europe/Kiev",
                     }
                 }
             },
         },
         401: {
-            "description": "Неавторизований доступ",
+            "description": "Unauthorized access",
             "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
         },
         404: {
-            "description": "Профіль не знайдено",
+            "description": "Profile not found",
             "content": {"application/json": {"example": {"detail": "User not found"}}},
         },
         500: {
-            "description": "Внутрішня помилка сервера",
+            "description": "Internal server error",
             "content": {"application/json": {"example": {"detail": "Internal server error"}}},
         },
     },
 )
 async def get_profile(user_id: str = Depends(get_current_user)):
-    return await get_user_profile(user_id)
+    full_user = await get_user_profile(user_id)
 
+    if "user_id" not in full_user:
+        full_user["user_id"] = user_id
 
-# ------------------- Новый PUT для partial update -------------------
-@router.put(
-    "/profile2",
-    response_model=UpdateProfileResponse,
-    summary="Частково оновити профіль користувача",
-    description="Дозволяє частково оновити дані профілю поточного користувача. "
-    "Заборонено змінювати email, пароль та роль.",
-)
-async def update_profile2(
-    data: UserProfileUpdate2,
-    user_id: str = Depends(get_current_user),
-):
-    return await update_user_profile2(user_id, data)
+    return full_user
