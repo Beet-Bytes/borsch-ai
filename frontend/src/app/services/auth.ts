@@ -4,6 +4,7 @@ async function request<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${API}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(body),
   });
 
@@ -32,10 +33,5 @@ export async function confirmEmail(email: string, confirmation_code: string) {
 }
 
 export async function login(email: string, password: string) {
-  return request<{
-    access_token: string;
-    id_token: string;
-    refresh_token: string | null;
-    token_type: string;
-  }>('/auth/login', { email, password });
+  return request<{ message: string }>('/auth/login', { email, password });
 }

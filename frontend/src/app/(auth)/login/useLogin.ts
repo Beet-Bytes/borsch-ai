@@ -20,8 +20,7 @@ export function useLogin() {
     setError('');
     setLoading(true);
     try {
-      const data = await login(email, password);
-      localStorage.setItem('access_token', data.access_token);
+      await login(email, password);
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
