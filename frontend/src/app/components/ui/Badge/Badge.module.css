@@ -1,0 +1,52 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-family: var(--font-outfit), var(--font-family);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+/* Sizes */
+.default {
+  font-size: 12px;
+  line-height: 15px;
+  padding: 6px 14px;
+}
+
+.small {
+  font-size: 11px;
+  line-height: 14px;
+  padding: 4px 10px;
+}
+
+/* Diet & Preference — dietary tags (Vegan, Gluten-free) */
+.diet {
+  background-color: #027a4880;
+  color: var(--color-secondary-500);
+}
+
+/* AI & Smart — AI-generated labels */
+.ai {
+  background-color: #7a251280;
+  color: var(--color-primary-600);
+}
+
+/* Info & Stats — recipe metadata (calories, time, difficulty) */
+.info {
+  background-color: #3b82f680;
+  color: #89bcff;
+}
+
+/* Status — user progress and recipe states */
+.status {
+  background-color: #f59e0b80;
+  color: #fee37a;
+}
+
+/* Meal Type — neutral category labels */
+.meal {
+  background-color: #52525280;
+  color: var(--color-neutral-300);
+}
