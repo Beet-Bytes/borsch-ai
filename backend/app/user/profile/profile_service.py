@@ -79,4 +79,11 @@ async def get_user_profile(user_id: str):
     if not user:
         return {"message": "Profile not found"}
 
+    user.setdefault("profile", {})
+    user.setdefault("biometrics", {})
+    user.setdefault("preferences", {})
+    user.setdefault("hard_constraints", {})
+    user.setdefault("ml_vector", {})
+    user.setdefault("subscription", {"plan": "free", "expires_at": None})
+
     return user

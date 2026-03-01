@@ -1,0 +1,23 @@
+.page {
+  min-height: 100vh;
+}
+
+/* Navbar is fixed 64px — push content below it */
+.main {
+  padding-top: 64px;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-300);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.navLink:hover {
+  color: var(--color-neutral-50);
+}

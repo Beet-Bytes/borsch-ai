@@ -4,7 +4,7 @@ import styles from './PageWrapper.module.css';
 interface PageWrapperProps {
   title: string;
   subtitle?: string;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   fullHeight?: boolean;
 }
