@@ -1,0 +1,87 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Hide native checkbox */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Custom box */
+.box {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--color-neutral-500);
+  background-color: var(--color-neutral-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  color: transparent;
+}
+
+.input:checked + .box {
+  border-color: var(--color-primary-500);
+  background-color: var(--color-primary-500);
+  color: var(--color-neutral-50);
+  box-shadow: 0 0 6px 1px rgba(255, 90, 31, 0.4);
+}
+
+.input:focus-visible + .box {
+  border-color: var(--color-primary-500);
+  box-shadow:
+    0 0 0 1px var(--color-primary-500),
+    0 0 8px 1px rgba(255, 90, 31, 0.5);
+}
+
+.box.boxError {
+  border-color: var(--color-error);
+}
+
+.checkmark {
+  width: 10px;
+  height: 8px;
+}
+
+/* Label text */
+.label {
+  font-family: var(--font-outfit), var(--font-family);
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--text-body);
+  line-height: 1.4;
+}
+
+/* Error message */
+.errorMessage {
+  font-family: var(--font-outfit), var(--font-family);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 17px;
+  color: var(--color-error);
+  padding-left: 28px;
+}

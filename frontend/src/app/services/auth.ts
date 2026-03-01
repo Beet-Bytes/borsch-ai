@@ -16,8 +16,12 @@ async function request<T>(path: string, body: unknown): Promise<T> {
   return data as T;
 }
 
-export async function register(email: string, password: string) {
-  return request<{ message: string; user_id: string }>('/auth/register', { email, password });
+export async function register(email: string, password: string, agreed_to_terms: boolean) {
+  return request<{ message: string; user_id: string }>('/auth/register', {
+    email,
+    password,
+    agreed_to_terms,
+  });
 }
 
 export async function confirmEmail(email: string, confirmation_code: string) {
