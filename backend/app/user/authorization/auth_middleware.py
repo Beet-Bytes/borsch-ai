@@ -1,9 +1,10 @@
 import os
+from typing import Optional
 
 import jwt
 import requests
 from dotenv import load_dotenv
-from fastapi import HTTPException, Security, status
+from fastapi import HTTPException, Request, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.user.authorization.auth_service import AuthService
@@ -28,13 +29,20 @@ except Exception as e:
     jwks = {"keys": []}
 
 # -------------------- Security --------------------
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 auth_service = AuthService()
 
 
 # -------------------- Функція отримання поточного користувача --------------------
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
-    token = credentials.credentials
+async def get_current_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
+) -> str:
+    token = request.cookies.get("access_token")
+    if not token and credentials:
+        token = credentials.credentials
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
     try:
         # Отримання заголовка JWT та пошук відповідного ключа
