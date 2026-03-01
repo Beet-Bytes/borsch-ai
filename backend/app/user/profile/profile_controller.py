@@ -11,6 +11,7 @@ from app.user.user_schemas import (
     UpdateProfileResponse,
     UserProfileUpdate,
     UserProfileUpdateOptional,
+    UserResponseSchema,
 )
 
 router = APIRouter(tags=["Profile"])
@@ -111,8 +112,8 @@ async def update_profile_optional(
 # Отримати профіль користувача
 @router.get(
     "/profile",
-    response_model=ProfileSchema,
-    summary="Get user profile",
+    response_model=UserResponseSchema,
+    summary="Get full user profile",
     description=(
         "Returns the current user's profile, including first name, last name, "
         "birth date, avatar URL, locale, and timezone."
@@ -150,4 +151,7 @@ async def update_profile_optional(
 async def get_profile(user_id: str = Depends(get_current_user)):
     full_user = await get_user_profile(user_id)
 
-    return full_user["profile"]
+    if "user_id" not in full_user:
+        full_user["user_id"] = user_id
+
+    return full_user
