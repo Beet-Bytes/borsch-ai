@@ -11,6 +11,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'Borsch AI',
   description: 'AI-powered recipe assistant',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
