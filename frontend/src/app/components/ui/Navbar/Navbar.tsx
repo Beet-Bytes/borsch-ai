@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Icon } from '@/app/components/ui/Icon/Icon';
-import type { IconName } from '@/app/components/ui/Icon/icons';
 import styles from './Navbar.module.css';
 
 export interface NavItem {
   label: string;
   href: string;
-  icon?: IconName;
+  icon?: ReactNode;
 }
 
 interface NavbarProps {
@@ -26,7 +24,7 @@ export function Navbar({ logo, navItems, actions }: NavbarProps) {
           <nav className={styles.nav}>
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} className={styles.navLink}>
-                {item.icon && <Icon name={item.icon} size="sm" className={styles.navIcon} />}
+                {item.icon && <span className={styles.navIcon}>{item.icon}</span>}
                 {item.label}
               </Link>
             ))}

@@ -35,3 +35,7 @@ export async function confirmEmail(email: string, confirmation_code: string) {
 export async function login(email: string, password: string) {
   return request<{ message: string }>('/auth/login', { email, password });
 }
+
+export async function logout() {
+  return request<{ message: string }>('/auth/logout', {});
+}
