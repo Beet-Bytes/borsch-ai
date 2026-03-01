@@ -58,7 +58,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         }
       />
       <FoodDecor className={styles.page}>
-        <main style={{ paddingTop: 64 }}>{children}</main>
+        <main className={styles.main}>{children}</main>
       </FoodDecor>
     </>
   );

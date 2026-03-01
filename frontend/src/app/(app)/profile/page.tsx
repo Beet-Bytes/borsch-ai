@@ -24,6 +24,12 @@ import { Toggle } from '@/app/components/ui/Toggle/Toggle';
 import { useProfile } from './useProfile';
 import styles from './page.module.css';
 
+const GENDER_OPTIONS = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'other', label: 'Other' },
+];
+
 const GOAL_OPTIONS = [
   { value: 'weight-loss', label: 'Weight Loss' },
   { value: 'maintain', label: 'Maintain Weight' },
@@ -75,7 +81,23 @@ export default function ProfilePage() {
               value={form.fullName}
               onChange={(e) => set('fullName', e.target.value)}
             />
-            <Input label="Email" type="email" placeholder="Your email" readOnly disabled />
+            <Input label="Email" type="email" value={form.email} readOnly disabled />
+          </div>
+          <div className={`${styles.grid} ${styles.gridGap}`}>
+            <Select
+              label="Gender"
+              options={GENDER_OPTIONS}
+              value={form.gender || null}
+              placeholder="Select gender"
+              onChange={(val) => set('gender', val as string)}
+            />
+            <Input
+              label="Height (cm)"
+              type="number"
+              placeholder="e.g. 175"
+              value={form.height}
+              onChange={(e) => set('height', e.target.value)}
+            />
           </div>
           <div className={styles.dateField}>
             <Input
@@ -119,6 +141,22 @@ export default function ProfilePage() {
         {/* Goals & Activity */}
         <Card title="Goals & Activity" icon={<Flag size={20} />}>
           <div className={styles.grid}>
+            <Input
+              label="Current Weight (kg)"
+              type="number"
+              placeholder="e.g. 75"
+              value={form.weight}
+              onChange={(e) => set('weight', e.target.value)}
+            />
+            <Input
+              label="Target Weight (kg)"
+              type="number"
+              placeholder="e.g. 70"
+              value={form.targetWeight}
+              onChange={(e) => set('targetWeight', e.target.value)}
+            />
+          </div>
+          <div className={`${styles.grid} ${styles.gridGap}`}>
             <Select
               label="Weight Goal"
               options={GOAL_OPTIONS}

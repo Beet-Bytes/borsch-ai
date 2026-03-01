@@ -81,14 +81,14 @@ class SubscriptionUpdateSchemaOptional(BaseModel):
     expires_at: Optional[datetime] = None
 
 
-# -------------------- Профіль користувача (Required) --------------------
+# -------------------- Профіль користувача --------------------
 class ProfileSchema(BaseModel):
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     birthDate: Optional[date] = None
     avatar_url: Optional[str] = None
-    locale: str
-    timezone: str
+    locale: Optional[str] = None
+    timezone: Optional[str] = None
 
 
 # -------------------- Профіль користувача (Optional) --------------------

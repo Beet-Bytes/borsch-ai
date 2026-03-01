@@ -6,8 +6,13 @@ import { getProfile, updateProfile } from '@/app/services/profile';
 import { logout as logoutFn } from '@/app/services/auth';
 
 export interface ProfileForm {
+  email: string;
   fullName: string;
   birthDate: string;
+  gender: string;
+  height: string;
+  weight: string;
+  targetWeight: string;
   goal: string;
   activityLevel: string;
   diet: string;
@@ -17,8 +22,13 @@ export interface ProfileForm {
 }
 
 const DEFAULT: ProfileForm = {
+  email: '',
   fullName: '',
   birthDate: '',
+  gender: '',
+  height: '',
+  weight: '',
+  targetWeight: '',
   goal: '',
   activityLevel: '',
   diet: '',
@@ -40,15 +50,24 @@ export function useProfile() {
   useEffect(() => {
     getProfile()
       .then((data) => {
+        const allergies = data.hard_constraints?.allergies ?? [];
         const loaded: ProfileForm = {
-          fullName: [data.first_name, data.last_name].filter(Boolean).join(' '),
-          birthDate: data.birthDate ?? '',
-          goal: '',
-          activityLevel: '',
-          diet: '',
-          glutenFree: false,
-          dairyFree: false,
-          nutFree: false,
+          email: data.email ?? '',
+          fullName: [data.profile?.first_name, data.profile?.last_name].filter(Boolean).join(' '),
+          birthDate: data.profile?.birthDate
+            ? new Date(data.profile.birthDate).toISOString().split('T')[0]
+            : '',
+          gender: data.biometrics?.gender ?? '',
+          height: data.biometrics?.height_cm != null ? String(data.biometrics.height_cm) : '',
+          weight: data.biometrics?.weight_kg != null ? String(data.biometrics.weight_kg) : '',
+          targetWeight:
+            data.biometrics?.target_weight != null ? String(data.biometrics.target_weight) : '',
+          goal: data.biometrics?.goal ?? '',
+          activityLevel: data.biometrics?.activityLevel ?? '',
+          diet: data.hard_constraints?.diet ?? '',
+          glutenFree: allergies.includes('gluten'),
+          dairyFree: allergies.includes('dairy'),
+          nutFree: allergies.includes('nuts'),
         };
         setInitial(loaded);
         setForm(loaded);
@@ -79,6 +98,10 @@ export function useProfile() {
           ...(form.birthDate ? { birthDate: form.birthDate } : {}),
         },
         biometrics: {
+          ...(form.gender ? { gender: form.gender } : {}),
+          ...(form.height ? { height_cm: Number(form.height) } : {}),
+          ...(form.weight ? { weight_kg: Number(form.weight) } : {}),
+          ...(form.targetWeight ? { target_weight: Number(form.targetWeight) } : {}),
           ...(form.goal ? { goal: form.goal } : {}),
           ...(form.activityLevel ? { activityLevel: form.activityLevel } : {}),
         },

@@ -38,6 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  align-items: flex-start;
 }
 
 .avatarName {
@@ -52,6 +53,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-md);
+}
+
+.gridGap {
+  margin-top: var(--spacing-md);
 }
 
 .dateField {
