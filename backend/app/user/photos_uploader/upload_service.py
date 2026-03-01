@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from fastapi import HTTPException, UploadFile
 from PIL import Image, ImageOps
 
-# Enable HEIC/HEIF support in Pillow
 pillow_heif.register_heif_opener()
 
 load_dotenv()
@@ -37,6 +36,11 @@ MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 AVATAR_SIZE = (500, 500)
 
 
+# -------------------- Сервис для завантаження аватара --------------------
+# Приймає файл користувача
+# Перевіряє тип і розмір
+# Оптимізує зображення
+# Завантажує у S3
 async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     if not file or not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded or filename missing")
@@ -54,14 +58,11 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     if len(content) > MAX_FILE_SIZE_BYTES:
         raise HTTPException(status_code=413, detail=f"File too large. Max: {MAX_FILE_SIZE_MB}MB.")
 
-    # Process image: fix orientation, center-crop, resize, and convert to WEBP
     try:
         image = Image.open(io.BytesIO(content))
 
-        # Apply EXIF rotation to prevent sideways images from smartphones
         image = ImageOps.exif_transpose(image)
 
-        # Calculate coordinates for a perfect center crop
         width, height = image.size
         new_size = min(width, height)
 
@@ -72,10 +73,8 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
 
         image = image.crop((left, top, right, bottom))
 
-        # Resize using high-quality LANCZOS filter
         image = image.resize(AVATAR_SIZE, Image.Resampling.LANCZOS)
 
-        # Ensure RGBA mode to preserve transparency in WEBP format
         if image.mode not in ("RGB", "RGBA"):
             image = image.convert("RGBA")
 
@@ -89,7 +88,6 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file or format.")
 
-    # Upload optimized WEBP to S3
     file_key = f"{USER_AVATARS_FOLDER}/{user_id}_{uuid4()}.{extension}"
 
     try:
@@ -108,6 +106,8 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     return url, file_key
 
 
+# -------------------- Сервис для отримання аватара з S3 --------------------
+# Завантажує файл за file_key та повертає bytes
 async def get_avatar_bytes_from_s3(file_key: str) -> bytes:
     try:
         async with session.client("s3") as s3_client:
