@@ -97,18 +97,18 @@ async def update_recipe_optional(recipe_id: str, data: RecipeUpdateSchemaOptiona
     }
 
 
-# -------------------- Отримати рецепт за ID --------------------
-async def get_recipe(recipe_id: str):
-    try:
-        obj_id = ObjectId(recipe_id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid recipe ID")
-
-    recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
-    if not recipe:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-
-    return recipe
+# # -------------------- Отримати рецепт за ID --------------------
+# async def get_recipe(recipe_id: str):
+#     try:
+#         obj_id = ObjectId(recipe_id)
+#     except:
+#         raise HTTPException(status_code=400, detail="Invalid recipe ID")
+#
+#     recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
+#     if not recipe:
+#         raise HTTPException(status_code=404, detail="Recipe not found")
+#
+#     return recipe
 
 
 # -------------------- Пошук рецептів за назвою продукту --------------------
