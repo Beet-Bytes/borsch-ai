@@ -1,8 +1,7 @@
+from app.legal import legal_service as service
+from app.legal.legal_schemas import ConsentRequestSchema
 from app.user.authorization.auth_middleware import get_current_user
 from fastapi import APIRouter, Depends, Request
-
-from ..legal import legal_service as service
-from .legal_schemas import ConsentRequestSchema
 
 router = APIRouter(prefix="/api/legal", tags=["Legal"])
 
