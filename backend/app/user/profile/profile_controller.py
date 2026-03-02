@@ -19,7 +19,7 @@ router = APIRouter(tags=["Profile"])
 # -------------------- PUT /profile --------------------
 # Оновити повний профіль користувача
 @router.put(
-    "/profile/update",
+    "/profile/update/{user_id}",
     response_model=UpdateProfileResponse,
     summary="Update full user profile",
     description=(
@@ -65,7 +65,7 @@ async def update_profile(
 # -------------------- PUT /profile_optional --------------------
 # Часткове оновлення профілю користувача
 @router.put(
-    "/profile/update_optional",
+    "/profile/update_optional/{user_id}",
     response_model=UpdateProfileResponse,
     summary="Partially update user profile",
     description=(
@@ -110,7 +110,7 @@ async def update_profile_optional(
 # -------------------- GET /profile --------------------
 # Отримати профіль користувача
 @router.get(
-    "/profile",
+    "/profile/{user_id}",
     response_model=UserResponseSchema,
     summary="Get full user profile",
     description=(
