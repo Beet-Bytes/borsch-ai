@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # -------------------- Харчова цінність на порцію --------------------
@@ -14,7 +14,9 @@ class NutritionPerServingSchema(BaseModel):
 
 # -------------------- Інгредієнт --------------------
 class RecipeIngredientSchema(BaseModel):
-    _id: str
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: str = Field(alias="_id")
     quantity: float = Field(..., ge=0)
     unit: str
 
@@ -26,22 +28,22 @@ class RecipeStepSchema(BaseModel):
 
 
 # -------------------- Схема для створення рецепту --------------------
-# class RecipeCreateSchema(BaseModel):
-#     name: str
-#     goal: str
-#     cooking_time: int = Field(..., ge=0)
-#     difficulty: str
-#     number_of_servings: int = Field(..., ge=1)
-#     utensils: List[str]
-#     ingredients: List[RecipeIngredientSchema] = Field(
-#         ...,
-#         example=[
-#             {"_id": "69a08f6f28e5eb9ad7ae9045", "quantity": 130, "unit": "g"},
-#             {"_id": "69a08f6f28e5eb9ad7ae9046", "quantity": 50, "unit": "g"}
-#         ]
-#     )
-#     steps: List[RecipeStepSchema]
-#     total_nutrition_per_serving: NutritionPerServingSchema
+class RecipeCreateSchema(BaseModel):
+    name: str
+    goal: str
+    cooking_time: int = Field(..., ge=0)
+    difficulty: str
+    number_of_servings: int = Field(..., ge=1)
+    utensils: List[str]
+    ingredients: List[RecipeIngredientSchema] = Field(
+        ...,
+        example=[
+            {"_id": "69a08f6f28e5eb9ad7ae9045", "quantity": 130, "unit": "g"},
+            {"_id": "69a08f6f28e5eb9ad7ae9046", "quantity": 50, "unit": "g"},
+        ],
+    )
+    steps: List[RecipeStepSchema]
+    total_nutrition_per_serving: NutritionPerServingSchema
 
 
 # -------------------- Схема для повного оновлення рецепту --------------------
@@ -72,7 +74,9 @@ class RecipeUpdateSchemaOptional(BaseModel):
 
 # -------------------- Схема відповіді при отриманні рецепту --------------------
 class RecipeResponseSchema(BaseModel):
-    _id: str
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: str = Field(alias="_id")
     name: str
     goal: str
     cooking_time: int

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Query
 from app.recipe.recipe_schemas import (
     RecipeResponseSchema,
     RecipeSearchResponse,
-    # RecipeCreateSchema,
+    RecipeCreateSchema,
     RecipeUpdateSchema,
     RecipeUpdateSchemaOptional,
     UpdateRecipeResponse,
@@ -11,7 +11,7 @@ from app.recipe.recipe_schemas import (
 from app.recipe.recipe_service import (
     get_recipe,
     search_recipes_by_name,
-    # create_recipe,
+    create_recipe,
     update_recipe,
     update_recipe_optional,
 )
@@ -21,32 +21,32 @@ router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
 # -------------------- POST /recipes/create --------------------
 # Створити новий рецепт
-# @router.post(
-#     "/create",
-#     response_model=RecipeResponseSchema,
-#     summary="Create a new recipe",
-#     description="Creates a new recipe with ingredients, cooking steps, and nutrition per serving.",
-#     responses={
-#         200: {
-#             "description": "Recipe successfully created",
-#             "content": {"application/json": {"example": "69a091b428e5eb9ad7ae904c"}},
-#         },
-#         400: {
-#             "description": "Invalid input data",
-#             "content": {"application/json": {"example": {"detail": "Invalid input data"}}},
-#         },
-#         401: {
-#             "description": "Unauthorized access",
-#             "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
-#         },
-#         500: {
-#             "description": "Internal server error",
-#             "content": {"application/json": {"example": {"detail": "Internal server error"}}},
-#         },
-#     },
-# )
-# async def create_new_recipe(data: RecipeCreateSchema):
-#     return await create_recipe(data)
+@router.post(
+    "/create",
+    response_model=RecipeResponseSchema,
+    summary="Create a new recipe",
+    description="Creates a new recipe with ingredients, cooking steps, and nutrition per serving.",
+    responses={
+        200: {
+            "description": "Recipe successfully created",
+            "content": {"application/json": {"example": "69a091b428e5eb9ad7ae904c"}},
+        },
+        400: {
+            "description": "Invalid input data",
+            "content": {"application/json": {"example": {"detail": "Invalid input data"}}},
+        },
+        401: {
+            "description": "Unauthorized access",
+            "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
+        },
+        500: {
+            "description": "Internal server error",
+            "content": {"application/json": {"example": {"detail": "Internal server error"}}},
+        },
+    },
+)
+async def create_new_recipe(data: RecipeCreateSchema):
+    return await create_recipe(data)
 
 
 # -------------------- PUT /recipes/update/{recipe_id} --------------------

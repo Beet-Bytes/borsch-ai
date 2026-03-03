@@ -5,7 +5,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 
 from app.database import db
-from app.recipe.recipe_schemas import RecipeUpdateSchemaOptional  # , RecipeCreateSchema
+from app.recipe.recipe_schemas import RecipeUpdateSchemaOptional, RecipeCreateSchema
 
 
 # -------------------- Допоміжна функція для "плоского" словника --------------------
@@ -22,35 +22,35 @@ def flatten_dict(d, prefix=""):
 
 
 # -------------------- Створення рецепту --------------------
-# async def create_recipe(data: RecipeCreateSchema):
-#     # Перетворюємо Pydantic модель у словник
-#     recipe_dict = data.model_dump()
-#
-#     # Додаємо дату створення та оновлення
-#     recipe_dict["created_at"] = datetime.utcnow()
-#     recipe_dict["updated_at"] = datetime.utcnow()
-#
-#     # Перетворюємо _id інгредієнтів у ObjectId для MongoDB
-#     for ing in recipe_dict.get("ingredients", []):
-#         if "_id" in ing:
-#             try:
-#                 ing["_id"] = ObjectId(ing["_id"])
-#             except:
-#                 # Якщо _id не валідний ObjectId, залишаємо як string
-#                 pass
-#
-#     # Вставляємо рецепт у MongoDB
-#     result = await db.recipes.insert_one(recipe_dict)
-#
-#     # Додаємо _id документа рецепту у словник для повернення
-#     recipe_dict["_id"] = str(result.inserted_id)
-#
-#     # Перетворюємо _id інгредієнтів назад у string для відповіді API
-#     for ing in recipe_dict.get("ingredients", []):
-#         if "_id" in ing and isinstance(ing["_id"], ObjectId):
-#             ing["_id"] = str(ing["_id"])
-#
-#     return recipe_dict
+async def create_recipe(data: RecipeCreateSchema):
+    # Перетворюємо Pydantic модель у словник
+    recipe_dict = data.model_dump(by_alias=True)
+
+    # Додаємо дату створення та оновлення
+    recipe_dict["created_at"] = datetime.utcnow()
+    recipe_dict["updated_at"] = datetime.utcnow()
+
+    # Перетворюємо _id інгредієнтів у ObjectId для MongoDB
+    for ing in recipe_dict.get("ingredients", []):
+        if "_id" in ing:
+            try:
+                ing["_id"] = ObjectId(ing["_id"])
+            except:
+                # Якщо _id не валідний ObjectId, залишаємо як string
+                pass
+
+    # Вставляємо рецепт у MongoDB
+    result = await db.recipes.insert_one(recipe_dict)
+
+    # Додаємо _id документа рецепту у словник для повернення
+    recipe_dict["_id"] = str(result.inserted_id)
+
+    # Перетворюємо _id інгредієнтів назад у string для відповіді API
+    for ing in recipe_dict.get("ingredients", []):
+        if "_id" in ing and isinstance(ing["_id"], ObjectId):
+            ing["_id"] = str(ing["_id"])
+
+    return recipe_dict
 
 
 # -------------------- Повне оновлення рецепту --------------------
@@ -98,17 +98,17 @@ async def update_recipe_optional(recipe_id: str, data: RecipeUpdateSchemaOptiona
 
 
 # # -------------------- Отримати рецепт за ID --------------------
-# async def get_recipe(recipe_id: str):
-#     try:
-#         obj_id = ObjectId(recipe_id)
-#     except:
-#         raise HTTPException(status_code=400, detail="Invalid recipe ID")
-#
-#     recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
-#     if not recipe:
-#         raise HTTPException(status_code=404, detail="Recipe not found")
-#
-#     return recipe
+async def get_recipe(recipe_id: str):
+    try:
+        obj_id = ObjectId(recipe_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid recipe ID")
+
+    recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+
+    return recipe
 
 
 # -------------------- Пошук рецептів за назвою продукту --------------------
