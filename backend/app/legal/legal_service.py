@@ -32,3 +32,12 @@ async def save_user_consent(user_id: str, doc_type: str, version: str, ip_addres
     await db.user_consents.insert_one(consent_record)
 
     await db.users.update_one({"user_id": user_id}, {"$set": {f"legal_status.{doc_type}": version}})
+
+
+async def get_document_by_type(doc_type: str):
+    doc = await db.legal_documents.find_one({"document_type": doc_type, "is_active": True})
+
+    if doc:
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+    return doc
