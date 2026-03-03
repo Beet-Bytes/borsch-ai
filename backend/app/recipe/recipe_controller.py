@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException
 
 from app.recipe.recipe_schemas import (
     RecipeCreateSchema,
@@ -11,7 +11,7 @@ from app.recipe.recipe_schemas import (
 from app.recipe.recipe_service import (
     create_recipe,
     get_recipe,
-    search_recipes_by_name,
+    search_recipes_by_ingredient_name,
     update_recipe,
     update_recipe_optional,
 )
@@ -88,8 +88,7 @@ async def create_new_recipe(data: RecipeCreateSchema):
     },
 )
 async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
-    raw_data = data.model_dump(exclude_unset=True)
-    return await update_recipe(recipe_id, raw_data)
+    return await update_recipe(recipe_id, data)
 
 
 # -------------------- PUT /recipes/update_optional/{recipe_id} --------------------
@@ -132,6 +131,77 @@ async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
 )
 async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional):
     return await update_recipe_optional(recipe_id, data)
+
+
+# -------------------- GET /recipes/search --------------------
+# Пошук рецептів за назвою продукту
+@router.get(
+    "/search",
+    response_model=RecipeSearchResponse,
+    summary="Search recipes by product name",
+    description="Searches for recipes that contain a product with the specified name.",
+    responses={
+        200: {
+            "description": "Recipes successfully retrieved",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "recipes": [
+                            {
+                                "_id": "69a091b428e5eb9ad7ae904c",
+                                "name": "Scrambled Eggs",
+                                "goal": "muscle_gain",
+                                "cooking_time": 10,
+                                "difficulty": "easy",
+                                "number_of_servings": 2,
+                                "utensils": ["Pan", "Spatula"],
+                                "ingredients": [
+                                    {
+                                        "_id": "69a08f6f28e5eb9ad7ae9034",
+                                        "quantity": 3,
+                                        "unit": "pcs",
+                                    }
+                                ],
+                                "steps": [
+                                    {"step_number": 1, "instruction": "Crack eggs into bowl."}
+                                ],
+                                "total_nutrition_per_serving": {
+                                    "calories": 250,
+                                    "protein": 18,
+                                    "fat": 19,
+                                    "carbs": 2,
+                                },
+                                "created_at": "2026-03-02T10:00:00Z",
+                                "updated_at": "2026-03-02T10:00:00Z",
+                            }
+                        ]
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid query parameter",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Query parameter 'name' must not be empty"}
+                }
+            },
+        },
+        404: {
+            "description": "No recipes found",
+            "content": {"application/json": {"example": {"detail": "No recipes found"}}},
+        },
+        500: {
+            "description": "Internal server error",
+            "content": {"application/json": {"example": {"detail": "Internal server error"}}},
+        },
+    },
+)
+async def search_recipes(name: str):
+    if not name.strip():
+        raise HTTPException(status_code=400, detail="Invalid query")
+
+    return await search_recipes_by_ingredient_name(name)
 
 
 # -------------------- GET /recipes/{recipe_id} --------------------
@@ -194,35 +264,3 @@ async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional
 )
 async def get_recipe_by_id(recipe_id: str):
     return await get_recipe(recipe_id)
-
-
-# -------------------- GET /recipes/search --------------------
-# Пошук рецептів за назвою продукту
-@router.get(
-    "/search",
-    response_model=RecipeSearchResponse,
-    summary="Search recipes by product name",
-    description="Returns a list of recipes that include a product with the specified name.",
-    responses={
-        200: {
-            "description": "Recipes found",
-            "content": {"application/json": {"example": {"recipes": []}}},
-        },
-        400: {
-            "description": "Invalid query",
-            "content": {"application/json": {"example": {"detail": "Invalid query"}}},
-        },
-        401: {
-            "description": "Unauthorized access",
-            "content": {"application/json": {"example": {"detail": "Not authenticated"}}},
-        },
-        500: {
-            "description": "Internal server error",
-            "content": {"application/json": {"example": {"detail": "Internal server error"}}},
-        },
-    },
-)
-async def search_recipes(
-    name: str = Query(..., min_length=1, description="Назва продукту для пошуку рецептів")
-):
-    return await search_recipes_by_name(name)

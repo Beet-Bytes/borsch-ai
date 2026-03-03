@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import List
 
 from bson import ObjectId
 from fastapi import HTTPException
 
 from app.database import db
-from app.recipe.recipe_schemas import RecipeCreateSchema, RecipeUpdateSchemaOptional
+from app.recipe.recipe_schemas import (
+    RecipeCreateSchema,
+    RecipeUpdateSchema,
+    RecipeUpdateSchemaOptional,
+)
 
 
 # -------------------- Допоміжна функція для "плоского" словника --------------------
@@ -23,29 +26,22 @@ def flatten_dict(d, prefix=""):
 
 # -------------------- Створення рецепту --------------------
 async def create_recipe(data: RecipeCreateSchema):
-    # Перетворюємо Pydantic модель у словник
     recipe_dict = data.model_dump(by_alias=True)
 
-    # Додаємо дату створення та оновлення
     recipe_dict["created_at"] = datetime.utcnow()
     recipe_dict["updated_at"] = datetime.utcnow()
 
-    # Перетворюємо _id інгредієнтів у ObjectId для MongoDB
     for ing in recipe_dict.get("ingredients", []):
         if "_id" in ing:
             try:
                 ing["_id"] = ObjectId(ing["_id"])
             except Exception:
-                # Якщо _id не валідний ObjectId, залишаємо як string
                 pass
 
-    # Вставляємо рецепт у MongoDB
     result = await db.recipes.insert_one(recipe_dict)
 
-    # Додаємо _id документа рецепту у словник для повернення
     recipe_dict["_id"] = str(result.inserted_id)
 
-    # Перетворюємо _id інгредієнтів назад у string для відповіді API
     for ing in recipe_dict.get("ingredients", []):
         if "_id" in ing and isinstance(ing["_id"], ObjectId):
             ing["_id"] = str(ing["_id"])
@@ -54,13 +50,27 @@ async def create_recipe(data: RecipeCreateSchema):
 
 
 # -------------------- Повне оновлення рецепту --------------------
-async def update_recipe(recipe_id: str, raw_data: dict):
-    update_query = flatten_dict(raw_data)
-    update_query["updated_at"] = datetime.utcnow()
+async def update_recipe(recipe_id: str, data: RecipeUpdateSchema):
+    try:
+        obj_id = ObjectId(recipe_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid recipe ID")
+
+    raw_data = data.model_dump(by_alias=True)
+
+    # Конвертация ingredient _id в ObjectId
+    for ing in raw_data.get("ingredients", []):
+        if "_id" in ing:
+            try:
+                ing["_id"] = ObjectId(ing["_id"])
+            except Exception:
+                raise HTTPException(status_code=400, detail="Invalid ingredient ID")
+
+    raw_data["updated_at"] = datetime.utcnow()
 
     result = await db.recipes.update_one(
-        {"_id": ObjectId(recipe_id)},
-        {"$set": update_query},
+        {"_id": obj_id},
+        {"$set": raw_data},
     )
 
     if result.matched_count == 0:
@@ -68,23 +78,40 @@ async def update_recipe(recipe_id: str, raw_data: dict):
 
     return {
         "status": "success",
-        "updated_fields": list(update_query.keys()),
+        "updated_fields": list(raw_data.keys()),
         "matched_count": result.matched_count,
     }
 
 
 # -------------------- Часткове оновлення рецепту --------------------
 async def update_recipe_optional(recipe_id: str, data: RecipeUpdateSchemaOptional):
-    raw_data = data.model_dump(exclude_unset=True)
-    if not raw_data:
-        return {"status": "success", "updated_fields": [], "matched_count": 0}
+    try:
+        obj_id = ObjectId(recipe_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid recipe ID")
 
-    update_query = flatten_dict(raw_data)
-    update_query["updated_at"] = datetime.utcnow()
+    raw_data = data.model_dump(by_alias=True, exclude_unset=True)
+
+    if not raw_data:
+        return {
+            "status": "success",
+            "updated_fields": [],
+            "matched_count": 0,
+        }
+
+    if "ingredients" in raw_data:
+        for ing in raw_data["ingredients"]:
+            if "_id" in ing:
+                try:
+                    ing["_id"] = ObjectId(ing["_id"])
+                except Exception:
+                    raise HTTPException(status_code=400, detail="Invalid ingredient ID")
+
+    raw_data["updated_at"] = datetime.utcnow()
 
     result = await db.recipes.update_one(
-        {"_id": ObjectId(recipe_id)},
-        {"$set": update_query},
+        {"_id": obj_id},
+        {"$set": raw_data},
     )
 
     if result.matched_count == 0:
@@ -92,31 +119,73 @@ async def update_recipe_optional(recipe_id: str, data: RecipeUpdateSchemaOptiona
 
     return {
         "status": "success",
-        "updated_fields": list(update_query.keys()),
+        "updated_fields": list(raw_data.keys()),
         "matched_count": result.matched_count,
     }
 
 
-# # -------------------- Отримати рецепт за ID --------------------
+# -------------------- Пошук рецептів за назвою продукту --------------------
+async def search_recipes_by_ingredient_name(name: str):
+    if not name.strip():
+        raise HTTPException(status_code=400, detail="Invalid query")
+
+    pipeline = [
+        {"$unwind": "$ingredients"},
+        {
+            "$lookup": {
+                "from": "products",
+                "localField": "ingredients._id",
+                "foreignField": "_id",
+                "as": "product",
+            }
+        },
+        {"$unwind": "$product"},
+        {"$match": {"product.name": {"$regex": name, "$options": "i"}}},
+        {
+            "$group": {
+                "_id": "$_id",
+                "name": {"$first": "$name"},
+                "goal": {"$first": "$goal"},
+                "cooking_time": {"$first": "$cooking_time"},
+                "difficulty": {"$first": "$difficulty"},
+                "number_of_servings": {"$first": "$number_of_servings"},
+                "utensils": {"$first": "$utensils"},
+                "ingredients": {"$push": "$ingredients"},
+                "steps": {"$first": "$steps"},
+                "total_nutrition_per_serving": {"$first": "$total_nutrition_per_serving"},
+                "created_at": {"$first": "$created_at"},
+                "updated_at": {"$first": "$updated_at"},
+            }
+        },
+        {"$limit": 50},
+    ]
+
+    cursor = db.recipes.aggregate(pipeline)
+    results = await cursor.to_list(length=50)
+
+    for recipe in results:
+        recipe["_id"] = str(recipe["_id"])
+        for ing in recipe.get("ingredients", []):
+            if "_id" in ing and isinstance(ing["_id"], ObjectId):
+                ing["_id"] = str(ing["_id"])
+
+    return {"recipes": results}
+
+
+# -------------------- Отримати рецепт за ID --------------------
 async def get_recipe(recipe_id: str):
     try:
         obj_id = ObjectId(recipe_id)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid recipe ID")
 
-    recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
+    recipe = await db.recipes.find_one({"_id": obj_id})
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
 
+    recipe["_id"] = str(recipe["_id"])
+    for ing in recipe.get("ingredients", []):
+        if "_id" in ing and isinstance(ing["_id"], ObjectId):
+            ing["_id"] = str(ing["_id"])
+
     return recipe
-
-
-# -------------------- Пошук рецептів за назвою продукту --------------------
-async def search_recipes_by_name(name: str) -> List[dict]:
-    # Використовуємо регекс для пошуку продукту в інгредієнтах
-    cursor = db.recipes.find(
-        {"ingredients": {"$elemMatch": {"name": {"$regex": name, "$options": "i"}}}},
-        {"_id": 1, "name": 1, "goal": 1, "cooking_time": 1, "difficulty": 1},
-    )
-    results = await cursor.to_list(length=50)  # максимум 50 результатів
-    return {"recipes": results}
