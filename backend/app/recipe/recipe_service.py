@@ -5,7 +5,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 
 from app.database import db
-from app.recipe.recipe_schemas import RecipeUpdateSchemaOptional, RecipeCreateSchema
+from app.recipe.recipe_schemas import RecipeCreateSchema, RecipeUpdateSchemaOptional
 
 
 # -------------------- Допоміжна функція для "плоского" словника --------------------
@@ -35,7 +35,7 @@ async def create_recipe(data: RecipeCreateSchema):
         if "_id" in ing:
             try:
                 ing["_id"] = ObjectId(ing["_id"])
-            except:
+            except Exception:
                 # Якщо _id не валідний ObjectId, залишаємо як string
                 pass
 
@@ -101,7 +101,7 @@ async def update_recipe_optional(recipe_id: str, data: RecipeUpdateSchemaOptiona
 async def get_recipe(recipe_id: str):
     try:
         obj_id = ObjectId(recipe_id)
-    except:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid recipe ID")
 
     recipe = await db.recipes.find_one({"_id": obj_id}, {"_id": 0})
