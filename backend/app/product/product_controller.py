@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from typing import List
+from fastapi import APIRouter, Query
 
 from app.product.product_schemas import (
     ProductCreateSchema,
@@ -6,12 +7,14 @@ from app.product.product_schemas import (
     ProductUpdateSchema,
     ProductUpdateSchemaOptional,
     UpdateProductResponse,
+    ProductSearchResponseSchema,
 )
 from app.product.product_service import (
     create_product,
     get_product,
     update_product,
     update_product_optional,
+    search_products_by_name,
 )
 
 router = APIRouter(prefix="/products", tags=["Products"])
@@ -130,6 +133,18 @@ async def update_product_full(product_id: str, data: ProductUpdateSchema):
 )
 async def update_product_partial(product_id: str, data: ProductUpdateSchemaOptional):
     return await update_product_optional(product_id, data)
+
+
+# -------------------- GET /products/search --------------------
+# Пошук продуктів для модального вікна редагування
+@router.get(
+    "/search",
+    response_model=List[ProductSearchResponseSchema],
+    summary="Search products",
+    description="Search products by name with partial match.",
+)
+async def search_products(q: str = Query(..., min_length=1, description="Search query")):
+    return await search_products_by_name(q)
 
 
 # -------------------- GET /products/{product_id} --------------------

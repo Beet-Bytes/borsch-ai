@@ -94,3 +94,24 @@ async def get_product(product_id: str):
         raise HTTPException(status_code=404, detail="Product not found")
 
     return product
+
+
+# -------------------- Сервіс пошуку продуктів --------------------
+# Шукає продукти за назвою (regex, case-insensitive) для UI модалки.
+async def search_products_by_name(query: str, limit: int = 10):
+    if not query.strip():
+        return []
+
+    # Шукаємо збіги в полі name, ігноруючи регістр ($options: "i")
+    cursor = db.products.find(
+        {"name": {"$regex": query, "$options": "i"}}, {"_id": 1, "name": 1, "category": 1}
+    ).limit(limit)
+
+    products = await cursor.to_list(length=limit)
+
+    result = []
+    for p in products:
+        p["id"] = str(p.pop("_id"))
+        result.append(p)
+
+    return result
