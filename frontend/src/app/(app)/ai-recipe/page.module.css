@@ -424,3 +424,109 @@
   color: var(--text-body);
   font-size: 14px;
 }
+
+/* =========================================
+   Рекомендовані рецепти (New Section)
+   ========================================= */
+
+.recipesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.recipeCard {
+  background: var(--color-neutral-900);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.recipeCard:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.recipeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recipeName {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.recipeMatchBadge {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success-500, #10b981);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.recipeMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recipeMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-body);
+}
+
+.difficultyBadge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Кольори для складності */
+.easy {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success-500, #10b981);
+}
+
+.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.hard {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error-500, #ef4444);
+}
+
+.recipeSummary {
+  font-size: 14px;
+  color: var(--text-body);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.viewRecipeBtn {
+  margin-top: auto;
+  width: 100%;
+}

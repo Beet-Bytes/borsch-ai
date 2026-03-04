@@ -100,3 +100,9 @@ class UpdateRecipeResponse(BaseModel):
 # -------------------- Схема відповіді при пошуку рецептів --------------------
 class RecipeSearchResponse(BaseModel):
     recipes: List[RecipeResponseSchema]
+
+
+class RecommendRequestSchema(BaseModel):
+    ingredients: List[str] = Field(
+        ..., description="List of ingredient names available from the fridge"
+    )

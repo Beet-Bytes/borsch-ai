@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from app.user.authorization.auth_middleware import get_current_user
 from app.user.profile.profile_service import (
     get_user_profile,
@@ -6,7 +7,6 @@ from app.user.profile.profile_service import (
     update_user_profile_optional,
 )
 from app.user.user_schemas import (
-    UpdateProfileResponse,
     UserProfileUpdate,
     UserProfileUpdateOptional,
     UserResponseSchema,

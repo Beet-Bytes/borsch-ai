@@ -19,9 +19,12 @@ export function useAIRecipe() {
 
   const [isDragging, setIsDragging] = useState(false);
 
-  // Локальні стейти для інгредієнтів
+  // Local states for ingredients
   const [originalAiIngredients, setOriginalAiIngredients] = useState<string[]>([]);
   const [editableIngredients, setEditableIngredients] = useState<DetectedIngredient[]>([]);
+
+  // ВИПРАВЛЕНО: змінено типізацію з never[] на any[] (або можна описати точний інтерфейс Recipe)
+  const [recommendedRecipes, setRecommendedRecipes] = useState<any[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -36,6 +39,7 @@ export function useAIRecipe() {
     setResult(null);
     setEditableIngredients([]);
     setOriginalAiIngredients([]);
+    setRecommendedRecipes([]);
     setError('');
   };
 
@@ -48,10 +52,12 @@ export function useAIRecipe() {
     e.preventDefault();
     setIsDragging(true);
   };
+
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
   };
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
@@ -70,7 +76,6 @@ export function useAIRecipe() {
       setResult(data);
       setEditableIngredients(data.ingredients || []);
 
-      // Зберігаємо оригінальні назви для бекенду
       const originalNames = (data.ingredients || []).map((item) => item.ingredient);
       setOriginalAiIngredients(originalNames);
     } catch (err) {
@@ -90,6 +95,7 @@ export function useAIRecipe() {
     setResult(null);
     setEditableIngredients([]);
     setOriginalAiIngredients([]);
+    setRecommendedRecipes([]);
     setError('');
   };
 
@@ -97,10 +103,12 @@ export function useAIRecipe() {
     setEditingIndex(null);
     setIsModalOpen(true);
   };
+
   const openEditModal = (index: number) => {
     setEditingIndex(index);
     setIsModalOpen(true);
   };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingIndex(null);
@@ -126,10 +134,40 @@ export function useAIRecipe() {
     try {
       const finalNames = editableIngredients.map((item) => item.ingredient);
 
-      const response = await generateRecipesApi(file, originalAiIngredients, finalNames);
+      // 1. Save feedback
+      const saveResponse = await generateRecipesApi(file, originalAiIngredients, finalNames);
+      console.log('Successfully saved feedback:', saveResponse);
 
-      console.log('Successfully saved to DB & R2:', response);
-      alert('Збережено в R2 та Mongo! Перевір базу.');
+      // 2. Fetch recommendations with cookies included
+      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+      const recommendRes = await fetch(`${API}/recipes/recommend`, {
+        method: 'POST',
+        credentials: 'include', // <--- КЛЮЧОВА ЗМІНА: передаємо куки з токеном
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ingredients: finalNames,
+        }),
+      });
+
+      if (!recommendRes.ok) {
+        const errData = await recommendRes.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Failed to fetch recommendations from the server.');
+      }
+
+      const recommendData = await recommendRes.json();
+      console.log('Raw backend response:', recommendData);
+
+      // Перевіряємо, чи бекенд повернув масив напряму, чи обгорнув його в поле recipes
+      const recipesArray = Array.isArray(recommendData)
+        ? recommendData
+        : recommendData.recipes || [];
+
+      console.log('Parsed recipes array:', recipesArray);
+
+      setRecommendedRecipes(recipesArray);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate recipes');
     } finally {
@@ -146,6 +184,7 @@ export function useAIRecipe() {
     result,
     isDragging,
     editableIngredients,
+    recommendedRecipes,
     isModalOpen,
     openAddModal,
     openEditModal,

@@ -1,12 +1,13 @@
-import os
 import json
-import httpx
+import os
 from datetime import datetime
+
+import httpx
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.database import db
-from app.user.authorization.auth_middleware import get_current_user
 from app.fridge.fridge_upload_service import upload_fridge_scan_to_s3
+from app.user.authorization.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/fridge", tags=["Fridge Scanning"])
 

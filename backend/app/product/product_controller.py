@@ -1,20 +1,21 @@
 from typing import List
+
 from fastapi import APIRouter, Query
 
 from app.product.product_schemas import (
     ProductCreateSchema,
     ProductResponseSchema,
+    ProductSearchResponseSchema,
     ProductUpdateSchema,
     ProductUpdateSchemaOptional,
     UpdateProductResponse,
-    ProductSearchResponseSchema,
 )
 from app.product.product_service import (
     create_product,
     get_product,
+    search_products_by_name,
     update_product,
     update_product_optional,
-    search_products_by_name,
 )
 
 router = APIRouter(prefix="/products", tags=["Products"])

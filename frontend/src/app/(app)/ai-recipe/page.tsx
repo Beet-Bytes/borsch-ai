@@ -12,6 +12,8 @@ import {
   Pencil,
   Plus,
   Search,
+  ChefHat,
+  Clock,
 } from 'lucide-react';
 import { PageWrapper } from '@/app/components/ui/PageWrapper/PageWrapper';
 import { Card } from '@/app/components/ui/Card/Card';
@@ -29,6 +31,7 @@ export default function AIRecipePage() {
     result,
     isDragging,
     editableIngredients,
+    recommendedRecipes,
     isModalOpen,
     openAddModal,
     openEditModal,
@@ -45,6 +48,7 @@ export default function AIRecipePage() {
   } = useAIRecipe();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recipesRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -71,6 +75,14 @@ export default function AIRecipePage() {
 
     return () => clearTimeout(delayTimer);
   }, [searchQuery, isModalOpen]);
+
+  useEffect(() => {
+    if (recommendedRecipes && recommendedRecipes.length > 0) {
+      setTimeout(() => {
+        recipesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [recommendedRecipes]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -221,6 +233,59 @@ export default function AIRecipePage() {
               </Button>
             </div>
           </Card>
+        )}
+
+        {/* НОВА СЕКЦІЯ: Рекомендовані рецепти */}
+        {recommendedRecipes && recommendedRecipes.length > 0 && (
+          <div ref={recipesRef}>
+            {' '}
+            {/* <-- ОБГОРТКА З РЕФОМ ДЛЯ СКРОЛУ */}
+            <Card title="Recommended Recipes" icon={<ChefHat size={20} />}>
+              <div className={styles.recipesList}>
+                {recommendedRecipes.map((recipe, index) => {
+                  // Витягуємо дані з фолбеками (якщо бекенд віддав інші назви полів)
+                  const recipeName = recipe.name || recipe.title || 'Unnamed Recipe';
+                  const matchPercent = Number(
+                    recipe.match_percentage || recipe.match_score || recipe.score || 0
+                  );
+                  const prepTime = recipe.cooking_time || recipe.time || recipe.prep_time || 0;
+                  const difficulty = recipe.difficulty || recipe.level || 'medium';
+                  const matchedCount =
+                    recipe.matched_ingredients_count || recipe.matched_count || 0;
+
+                  return (
+                    <div key={recipe._id || recipe.id || index} className={styles.recipeCard}>
+                      <div className={styles.recipeHeader}>
+                        <h4 className={styles.recipeName}>{recipeName}</h4>
+                        <span className={styles.recipeMatchBadge}>
+                          {Math.round(matchPercent * 100)}% Match
+                        </span>
+                      </div>
+
+                      <div className={styles.recipeMeta}>
+                        <span className={styles.recipeMetaItem}>
+                          <Clock size={14} /> {prepTime} min
+                        </span>
+                        <span
+                          className={`${styles.difficultyBadge} ${styles[difficulty.toLowerCase()] || styles.medium}`}
+                        >
+                          {difficulty}
+                        </span>
+                      </div>
+
+                      <p className={styles.recipeSummary}>
+                        Matched {matchedCount} of your ingredients.
+                      </p>
+
+                      <Button variant="secondary" className={styles.viewRecipeBtn}>
+                        View Recipe
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </div>
         )}
       </div>
 
