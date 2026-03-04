@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
+import { CookieBanner } from '@/app/components/ui/CookieBanner/CookieBanner';
 import './globals.css';
 
 const outfit = Outfit({
@@ -23,7 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={outfit.variable}>{children}</body>
+      <body className={outfit.variable}>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }
