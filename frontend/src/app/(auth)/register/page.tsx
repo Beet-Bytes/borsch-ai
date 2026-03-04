@@ -53,11 +53,11 @@ export default function RegisterPage() {
           label={
             <>
               I agree to the{' '}
-              <Link href="/terms" className={styles.link}>
+              <Link href="/legal/terms_of_service" className={styles.link}>
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className={styles.link}>
+              <Link href="/legal/privacy_policy" className={styles.link}>
                 Privacy Policy
               </Link>
             </>
