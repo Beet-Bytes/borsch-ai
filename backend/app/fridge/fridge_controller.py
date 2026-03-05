@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.database import db
 from app.fridge.fridge_upload_service import upload_fridge_scan_to_s3
-from app.user.authorization.auth_middleware import get_current_user
 from app.legal.legal_middleware import verify_legal_consent
+from app.user.authorization.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/fridge", tags=["Fridge Scanning"])
 
@@ -25,7 +25,6 @@ async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(verif
     file_bytes = await file.read()
     predict_url = f"{AI_SERVICE_URL}/predict"
 
-    # Тільки отримуємо дані від ML, ніякого R2 і БД
     async with httpx.AsyncClient() as client:
         try:
             files = {"file": (file.filename, file_bytes, file.content_type)}
@@ -38,7 +37,30 @@ async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(verif
                 status_code=response.status_code, detail=f"AI Service error: {response.text}"
             )
 
-    return response.json()
+    data = response.json()
+    ingredients = data.get("ingredients", [])
+
+    if ingredients:
+        ai_labels = [item.get("ingredient") for item in ingredients if item.get("ingredient")]
+
+        cursor = db.products.find({"ai_label": {"$in": ai_labels}})
+        matching_products = await cursor.to_list(length=None)
+
+        label_to_name = {
+            p.get("ai_label"): p.get("name") for p in matching_products if p.get("ai_label")
+        }
+
+        for item in ingredients:
+            original_label = item["ingredient"]
+
+            item["ai_label"] = original_label
+
+            if original_label in label_to_name:
+                item["ingredient"] = label_to_name[original_label]
+            else:
+                item["ingredient"] = original_label.replace("_", " ").capitalize()
+
+    return data
 
 
 @router.post("/generate", summary="Save to R2, save feedback, and generate recipes")
