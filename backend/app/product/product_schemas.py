@@ -47,3 +47,10 @@ class UpdateProductResponse(BaseModel):
     status: str
     updated_fields: list[str]
     matched_count: int
+
+
+# --- Схема для результатів пошуку ---
+class ProductSearchResponseSchema(BaseModel):
+    id: str
+    name: str
+    category: str

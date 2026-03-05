@@ -1,0 +1,532 @@
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Upload Area */
+.uploadArea {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.uploadArea:hover,
+.dragActive {
+  border-color: var(--color-primary-500);
+  background: rgba(255, 90, 31, 0.05); /* Підлаштуйте під primary колір */
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadIcon {
+  color: var(--text-body);
+  margin-bottom: var(--spacing-md);
+  transition: color 0.2s ease;
+}
+
+.uploadArea:hover .uploadIcon,
+.dragActive .uploadIcon {
+  color: var(--color-primary-500);
+}
+
+.uploadText {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.uploadSubtext {
+  font-size: 13px;
+  color: var(--text-body);
+  margin: 0;
+}
+
+/* Preview & Scanning Animation */
+.previewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.imageWrapper {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-neutral-900);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.previewImage {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  color: var(--color-primary-500);
+  z-index: 10;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinnerText {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-medium);
+  font-size: 15px;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Ingredients List */
+.ingredientsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.ingredientItem {
+  background: var(--color-neutral-900);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: border-color 0.2s ease;
+}
+
+.ingredientItem:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ingredientHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ingredientName {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  text-transform: capitalize;
+}
+
+.removeBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-body);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.removeBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error-500, #ef4444);
+}
+
+.confidenceWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.confidenceBar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confidenceFill {
+  height: 100%;
+  background: var(--color-primary-500);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.confidenceText {
+  font-size: 12px;
+  color: var(--text-body);
+  min-width: 32px;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) 0;
+  text-align: center;
+  background: var(--color-neutral-900);
+  border-radius: var(--radius-md);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--spacing-lg);
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.emptySub {
+  font-size: 14px;
+  color: var(--text-body);
+  margin: 0;
+  max-width: 300px;
+}
+
+.error {
+  color: var(--color-error-500, #ef4444);
+  font-size: 14px;
+  margin-top: var(--spacing-md);
+}
+
+.bottomActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- Стилі для кнопок редагування та модалки --- */
+
+.listHeaderActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-md);
+}
+
+.itemActions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-body);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-heading);
+}
+
+/* Модальне вікно */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--spacing-md);
+}
+
+.modalContent {
+  background: var(--color-neutral-900);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-heading);
+}
+
+.closeModalBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-body);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  border-radius: var(--radius-sm);
+}
+
+.closeModalBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-error-500, #ef4444);
+}
+
+.modalBody {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-body);
+}
+
+.searchInput {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 12px 12px 12px 40px;
+  color: var(--text-heading);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--color-primary-500);
+}
+
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+}
+
+.searchResultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.searchResultItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.searchResultName {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+}
+
+.searchResultCat {
+  font-size: 12px;
+  color: var(--text-body);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.searchStateMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: var(--spacing-xl) 0;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+/* =========================================
+   Рекомендовані рецепти (New Section)
+   ========================================= */
+
+.recipesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.recipeCard {
+  background: var(--color-neutral-900);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.recipeCard:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.recipeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recipeName {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.recipeMatchBadge {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success-500, #10b981);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.recipeMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recipeMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-body);
+}
+
+.difficultyBadge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Кольори для складності */
+.easy {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success-500, #10b981);
+}
+
+.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.hard {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error-500, #ef4444);
+}
+
+.recipeSummary {
+  font-size: 14px;
+  color: var(--text-body);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.viewRecipeBtn {
+  margin-top: auto;
+  width: 100%;
+}
