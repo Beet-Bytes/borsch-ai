@@ -41,3 +41,26 @@ async def get_document_by_type(doc_type: str):
         doc["id"] = str(doc["_id"])
         del doc["_id"]
     return doc
+
+
+async def check_legal_compliance(user_id: str):
+    active_docs = await get_active_document_status()
+
+    user = await db.users.find_one({"user_id": user_id}, {"legal_status": 1})
+    user_status = user.get("legal_status", {}) if user else {}
+
+    outdated_or_missing = []
+
+    for document_type, required_version in active_docs.items():
+        user_version = user_status.get(document_type)
+
+        if user_version != required_version:
+            outdated_or_missing.append(
+                {
+                    "type": document_type,
+                    "required_version": required_version,
+                    "user_version": user_version or "None",
+                }
+            )
+
+    return outdated_or_missing

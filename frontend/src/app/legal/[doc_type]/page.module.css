@@ -1,0 +1,53 @@
+.state {
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+.content {
+  color: var(--text-body);
+  line-height: 1.7;
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  color: var(--text-heading);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.content h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.content h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.content h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.content p {
+  margin-bottom: 1rem;
+}
+
+.content ul,
+.content ol {
+  margin: 0.75rem 0 1rem 1.5rem;
+}
+
+.content li {
+  margin-bottom: 0.5rem;
+}
+
+.content a {
+  color: var(--color-primary-500);
+}
+
+.content a:hover {
+  text-decoration: underline;
+}
