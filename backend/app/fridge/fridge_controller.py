@@ -3,7 +3,7 @@ import os
 import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
-from app.user.authorization.auth_middleware import get_current_user
+from app.legal.legal_middleware import verify_legal_consent
 
 router = APIRouter(prefix="/fridge", tags=["Fridge Scanning"])
 
@@ -13,7 +13,7 @@ if not AI_SERVICE_URL:
 
 
 @router.post("/scan")
-async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
+async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(verify_legal_consent)):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="The file must be an image")
 
