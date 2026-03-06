@@ -39,3 +39,12 @@ export async function login(email: string, password: string) {
 export async function logout() {
   return request<{ message: string }>('/auth/logout', {});
 }
+
+export async function checkAuth(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API}/profile`, { credentials: 'include' });
+    return res.ok || res.status === 451;
+  } catch {
+    return false;
+  }
+}
