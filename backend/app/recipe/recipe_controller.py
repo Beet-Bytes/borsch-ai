@@ -17,7 +17,7 @@ from app.recipe.recipe_service import (
     update_recipe,
     update_recipe_optional,
 )
-from app.user.authorization.auth_middleware import get_current_user
+from app.user.authorization.auth_middleware import get_current_user, verify_admin
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
@@ -48,7 +48,7 @@ router = APIRouter(prefix="/recipes", tags=["Recipes"])
         },
     },
 )
-async def create_new_recipe(data: RecipeCreateSchema):
+async def create_new_recipe(data: RecipeCreateSchema, admin_id: str = Depends(verify_admin)):
     return await create_recipe(data)
 
 
@@ -90,7 +90,9 @@ async def create_new_recipe(data: RecipeCreateSchema):
         },
     },
 )
-async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
+async def update_recipe_full(
+    recipe_id: str, data: RecipeUpdateSchema, admin_id: str = Depends(verify_admin)
+):
     return await update_recipe(recipe_id, data)
 
 
@@ -132,7 +134,9 @@ async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
         },
     },
 )
-async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional):
+async def update_recipe_partial(
+    recipe_id: str, data: RecipeUpdateSchemaOptional, admin_id: str = Depends(verify_admin)
+):
     return await update_recipe_optional(recipe_id, data)
 
 

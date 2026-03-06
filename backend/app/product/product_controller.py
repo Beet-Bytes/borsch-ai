@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
 from app.product.product_schemas import (
     ProductCreateSchema,
@@ -17,6 +17,7 @@ from app.product.product_service import (
     update_product,
     update_product_optional,
 )
+from app.user.authorization.auth_middleware import verify_admin
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -47,7 +48,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
         },
     },
 )
-async def create_new_product(data: ProductCreateSchema):
+async def create_new_product(data: ProductCreateSchema, admin_id: str = Depends(verify_admin)):
     return await create_product(data)
 
 
@@ -89,7 +90,9 @@ async def create_new_product(data: ProductCreateSchema):
         },
     },
 )
-async def update_product_full(product_id: str, data: ProductUpdateSchema):
+async def update_product_full(
+    product_id: str, data: ProductUpdateSchema, admin_id: str = Depends(verify_admin)
+):
     raw_data = data.model_dump(exclude_unset=True)
     return await update_product(product_id, raw_data)
 
@@ -132,7 +135,9 @@ async def update_product_full(product_id: str, data: ProductUpdateSchema):
         },
     },
 )
-async def update_product_partial(product_id: str, data: ProductUpdateSchemaOptional):
+async def update_product_partial(
+    product_id: str, data: ProductUpdateSchemaOptional, admin_id: str = Depends(verify_admin)
+):
     return await update_product_optional(product_id, data)
 
 
