@@ -8,20 +8,25 @@ export function useRegister() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [agreed, setAgreed] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
-    agreed?: string;
+    agreedTerms?: string;
+    agreedPrivacy?: string;
     submit?: string;
   }>({});
   const [loading, setLoading] = useState(false);
+
+  const allAgreed = agreedTerms && agreedPrivacy;
 
   const validate = () => {
     const next: typeof errors = {};
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = 'Enter a valid email';
     if (password.length < 8) next.password = 'Password must be at least 8 characters';
-    if (!agreed) next.agreed = 'You must agree to the Terms & Privacy Policy';
+    if (!agreedTerms) next.agreedTerms = 'You must agree to the Terms of Service & EULA';
+    if (!agreedPrivacy) next.agreedPrivacy = 'You must agree to the Privacy Policy';
     return next;
   };
 
@@ -35,7 +40,7 @@ export function useRegister() {
     setErrors({});
     setLoading(true);
     try {
-      await register(email, password, agreed);
+      await register(email, password, true);
       router.push(`/confirm?email=${encodeURIComponent(email)}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed';
@@ -59,8 +64,11 @@ export function useRegister() {
     setEmail,
     password,
     setPassword,
-    agreed,
-    setAgreed,
+    agreedTerms,
+    setAgreedTerms,
+    agreedPrivacy,
+    setAgreedPrivacy,
+    allAgreed,
     errors,
     loading,
     handleSubmit,

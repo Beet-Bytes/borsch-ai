@@ -13,8 +13,11 @@ export default function RegisterPage() {
     setEmail,
     password,
     setPassword,
-    agreed,
-    setAgreed,
+    agreedTerms,
+    setAgreedTerms,
+    agreedPrivacy,
+    setAgreedPrivacy,
+    allAgreed,
     errors,
     loading,
     handleSubmit,
@@ -47,16 +50,29 @@ export default function RegisterPage() {
           error={errors.password}
         />
         <Checkbox
-          checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
-          error={errors.agreed}
+          checked={agreedTerms}
+          onChange={(e) => setAgreedTerms(e.target.checked)}
+          error={errors.agreedTerms}
           label={
             <>
               I agree to the{' '}
               <Link href="/legal/terms_of_service" className={styles.link}>
                 Terms of Service
               </Link>{' '}
-              and{' '}
+              &{' '}
+              <Link href="/legal/eula" className={styles.link}>
+                EULA
+              </Link>
+            </>
+          }
+        />
+        <Checkbox
+          checked={agreedPrivacy}
+          onChange={(e) => setAgreedPrivacy(e.target.checked)}
+          error={errors.agreedPrivacy}
+          label={
+            <>
+              I agree to the{' '}
               <Link href="/legal/privacy_policy" className={styles.link}>
                 Privacy Policy
               </Link>
@@ -64,7 +80,7 @@ export default function RegisterPage() {
           }
         />
         {errors.submit && <p className={styles.error}>{errors.submit}</p>}
-        <Button type="submit" fullWidth loading={loading}>
+        <Button type="submit" fullWidth loading={loading} disabled={!allAgreed}>
           Create account
         </Button>
       </form>
