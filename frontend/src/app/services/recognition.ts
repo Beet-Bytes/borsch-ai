@@ -3,6 +3,8 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 export interface DetectedIngredient {
   ingredient: string;
   confidence: number;
+  quantity?: number;
+  unit?: string;
 }
 
 export interface AIAnalyzeResponse {
@@ -10,7 +12,6 @@ export interface AIAnalyzeResponse {
   total_detected: number;
   ingredients: DetectedIngredient[];
   image_base64?: string;
-  // scan_id прибрано, бо воно створюється вже при генерації
 }
 
 export async function analyzeFridgeImage(imageFile: File): Promise<AIAnalyzeResponse> {
@@ -31,14 +32,20 @@ export async function analyzeFridgeImage(imageFile: File): Promise<AIAnalyzeResp
   return data as AIAnalyzeResponse;
 }
 
+// Створимо строгий тип для фінальних інгредієнтів (без unit!)
+export interface RecipeIngredientPayload {
+  name: string;
+  quantity: number;
+  unit: string;
+}
+
 export async function generateRecipesApi(
   imageFile: File,
   originalIngredients: string[],
-  finalIngredients: string[]
+  finalIngredients: RecipeIngredientPayload[]
 ) {
   const formData = new FormData();
 
-  // Передаємо файл і масиви (перетворені в JSON-рядки)
   formData.append('file', imageFile);
   formData.append('original_items', JSON.stringify(originalIngredients));
   formData.append('final_items', JSON.stringify(finalIngredients));

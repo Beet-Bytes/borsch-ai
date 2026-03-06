@@ -17,7 +17,7 @@ from app.recipe.recipe_service import (
     update_recipe,
     update_recipe_optional,
 )
-from app.user.authorization.auth_middleware import get_current_user
+from app.user.authorization.auth_middleware import get_current_user, verify_admin
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
@@ -48,7 +48,7 @@ router = APIRouter(prefix="/recipes", tags=["Recipes"])
         },
     },
 )
-async def create_new_recipe(data: RecipeCreateSchema):
+async def create_new_recipe(data: RecipeCreateSchema, admin_id: str = Depends(verify_admin)):
     return await create_recipe(data)
 
 
@@ -90,7 +90,9 @@ async def create_new_recipe(data: RecipeCreateSchema):
         },
     },
 )
-async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
+async def update_recipe_full(
+    recipe_id: str, data: RecipeUpdateSchema, admin_id: str = Depends(verify_admin)
+):
     return await update_recipe(recipe_id, data)
 
 
@@ -132,7 +134,9 @@ async def update_recipe_full(recipe_id: str, data: RecipeUpdateSchema):
         },
     },
 )
-async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional):
+async def update_recipe_partial(
+    recipe_id: str, data: RecipeUpdateSchemaOptional, admin_id: str = Depends(verify_admin)
+):
     return await update_recipe_optional(recipe_id, data)
 
 
@@ -158,13 +162,7 @@ async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional
                                 "difficulty": "easy",
                                 "number_of_servings": 2,
                                 "utensils": ["Pan", "Spatula"],
-                                "ingredients": [
-                                    {
-                                        "_id": "69a08f6f28e5eb9ad7ae9034",
-                                        "quantity": 3,
-                                        "unit": "pcs",
-                                    }
-                                ],
+                                "ingredients": [{"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 3}],
                                 "steps": [
                                     {"step_number": 1, "instruction": "Crack eggs into bowl."}
                                 ],
@@ -228,8 +226,8 @@ async def search_recipes(name: str):
                         "number_of_servings": 1,
                         "utensils": ["Pot", "Spoon", "Bowl", "Knife", "Cutting board"],
                         "ingredients": [
-                            {"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 50, "unit": "g"},
-                            {"_id": "69a08f6f28e5eb9ad7ae9035", "quantity": 200, "unit": "ml"},
+                            {"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 50},
+                            {"_id": "69a08f6f28e5eb9ad7ae9035", "quantity": 200},
                         ],
                         "steps": [
                             {"step_number": 1, "instruction": "Put oat flakes into a pot."},

@@ -67,22 +67,43 @@ export function useAIRecipe() {
 
   const handleAnalyze = async () => {
     if (!file) return;
-
     setLoading(true);
     setError('');
 
     try {
       const data = await analyzeFridgeImage(file);
       setResult(data);
-      setEditableIngredients(data.ingredients || []);
 
-      const originalNames = (data.ingredients || []).map((item) => item.ingredient);
-      setOriginalAiIngredients(originalNames);
+      const grouped: Record<string, DetectedIngredient> = {};
+      (data.ingredients || []).forEach((item) => {
+        if (grouped[item.ingredient]) {
+          grouped[item.ingredient].quantity = (grouped[item.ingredient].quantity || 1) + 1;
+          grouped[item.ingredient].confidence = Math.max(
+            grouped[item.ingredient].confidence,
+            item.confidence
+          );
+        } else {
+          grouped[item.ingredient] = { ...item, quantity: 1, unit: item.unit || 'pcs' };
+        }
+      });
+
+      setEditableIngredients(Object.values(grouped));
+      setOriginalAiIngredients((data.ingredients || []).map((item) => item.ingredient));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateIngredientItem = (
+    index: number,
+    field: keyof DetectedIngredient,
+    value: string | number
+  ) => {
+    const updated = [...editableIngredients];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditableIngredients(updated);
   };
 
   const removeIngredient = (indexToRemove: number) => {
@@ -114,59 +135,41 @@ export function useAIRecipe() {
     setEditingIndex(null);
   };
 
-  const saveIngredient = (newName: string) => {
+  const saveIngredient = (newName: string, defaultUnit: string = 'g') => {
     if (editingIndex !== null) {
       const updated = [...editableIngredients];
-      updated[editingIndex] = { ingredient: newName, confidence: 1.0 };
+      updated[editingIndex] = {
+        ...updated[editingIndex],
+        ingredient: newName,
+        unit: defaultUnit,
+      };
       setEditableIngredients(updated);
     } else {
-      setEditableIngredients((prev) => [...prev, { ingredient: newName, confidence: 1.0 }]);
+      // Використовуємо передану одиницю замість жорсткого 'g'
+      setEditableIngredients((prev) => [
+        ...prev,
+        { ingredient: newName, confidence: 1.0, quantity: 1, unit: defaultUnit },
+      ]);
     }
     closeModal();
   };
 
   const handleGenerateRecipes = async () => {
     if (!file || editableIngredients.length === 0) return;
-
     setIsGenerating(true);
     setError('');
 
     try {
-      const finalNames = editableIngredients.map((item) => item.ingredient);
+      // Формуємо фінальний масив ОБ'ЄКТІВ (з кількістю і одиницями)
+      const finalItems = editableIngredients.map((item) => ({
+        name: item.ingredient,
+        quantity: item.quantity || 1,
+        unit: item.unit || 'pcs',
+      }));
 
-      // 1. Save feedback
-      const saveResponse = await generateRecipesApi(file, originalAiIngredients, finalNames);
-      console.log('Successfully saved feedback:', saveResponse);
+      const response = await generateRecipesApi(file, originalAiIngredients, finalItems);
 
-      // 2. Fetch recommendations with cookies included
-      const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-      const recommendRes = await fetch(`${API}/recipes/recommend`, {
-        method: 'POST',
-        credentials: 'include', // <--- КЛЮЧОВА ЗМІНА: передаємо куки з токеном
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ingredients: finalNames,
-        }),
-      });
-
-      if (!recommendRes.ok) {
-        const errData = await recommendRes.json().catch(() => ({}));
-        throw new Error(errData.detail || 'Failed to fetch recommendations from the server.');
-      }
-
-      const recommendData = await recommendRes.json();
-      console.log('Raw backend response:', recommendData);
-
-      // Перевіряємо, чи бекенд повернув масив напряму, чи обгорнув його в поле recipes
-      const recipesArray = Array.isArray(recommendData)
-        ? recommendData
-        : recommendData.recipes || [];
-
-      console.log('Parsed recipes array:', recipesArray);
-
+      const recipesArray = Array.isArray(response.recipes) ? response.recipes : [];
       setRecommendedRecipes(recipesArray);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate recipes');
@@ -198,5 +201,6 @@ export function useAIRecipe() {
     handleClear,
     removeIngredient,
     handleGenerateRecipes,
+    updateIngredientItem,
   };
 }

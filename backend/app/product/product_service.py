@@ -93,6 +93,8 @@ async def get_product(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    product["default_unit"] = product.get("default_unit", "g")
+
     return product
 
 
@@ -102,9 +104,10 @@ async def search_products_by_name(query: str, limit: int = 10):
     if not query.strip():
         return []
 
-    # Шукаємо збіги в полі name, ігноруючи регістр ($options: "i")
+    # ДОДАНО "default_unit": 1 у проекцію
     cursor = db.products.find(
-        {"name": {"$regex": query, "$options": "i"}}, {"_id": 1, "name": 1, "category": 1}
+        {"name": {"$regex": query, "$options": "i"}},
+        {"_id": 1, "name": 1, "category": 1, "default_unit": 1},
     ).limit(limit)
 
     products = await cursor.to_list(length=limit)
@@ -112,6 +115,7 @@ async def search_products_by_name(query: str, limit: int = 10):
     result = []
     for p in products:
         p["id"] = str(p.pop("_id"))
+        p["default_unit"] = p.get("default_unit", "g")
         result.append(p)
 
     return result

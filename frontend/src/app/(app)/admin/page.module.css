@@ -1,0 +1,142 @@
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.tabActions {
+  display: flex;
+  gap: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: var(--spacing-md);
+}
+
+.adminForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.row > * {
+  flex: 1;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.inputLabel {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-body);
+}
+
+/* Стилізація інпутів та селектів у стилі твоїх .searchInput / .qtyInput */
+.adminInput,
+.adminSelect {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  color: var(--text-heading);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.adminInput:focus,
+.adminSelect:focus {
+  border-color: var(--color-primary-500);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.adminSelect {
+  cursor: pointer;
+  appearance: none;
+  /* Для кастомної стрілочки можна додати background-image */
+}
+
+.adminSelect option {
+  background: var(--color-neutral-900);
+  color: var(--text-heading);
+}
+
+.nutritionSection {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.sectionTitle {
+  font-size: 15px;
+  color: var(--text-heading);
+  margin: 0 0 var(--spacing-md) 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.nutritionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.successMsg {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success-500, #10b981);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.errorMsg {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error-500, #ef4444);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Перевикористання твого emptyState для заглушки рецептів */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) 0;
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.emptySub {
+  font-size: 14px;
+  color: var(--text-body);
+  margin: 0;
+}

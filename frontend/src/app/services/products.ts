@@ -4,6 +4,7 @@ export interface Product {
   id: string;
   name: string;
   category: string;
+  default_unit: string;
 }
 
 export async function searchProducts(query: string): Promise<Product[]> {

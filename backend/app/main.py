@@ -8,6 +8,7 @@ from app.recipe.recipe_controller import router as recipe_router
 from app.user.authorization.auth_controller import router as auth_router
 from app.user.photos_uploader.upload_controller import router as upload_router
 from app.user.profile.profile_controller import router as profile_router
+from app.user.user_controller import router as user_router
 
 app = FastAPI(title="AI Borsch API")
 
@@ -29,6 +30,8 @@ def read_root():
 def health_check():
     return {"status": "ok"}
 
+
+app.include_router(user_router)
 
 app.include_router(auth_router)
 app.include_router(profile_router)

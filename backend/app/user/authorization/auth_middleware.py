@@ -4,7 +4,7 @@ from typing import Optional
 import jwt
 import requests
 from dotenv import load_dotenv
-from fastapi import HTTPException, Request, Security, status
+from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.user.authorization.auth_service import AuthService
@@ -87,3 +87,32 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="The token has expired")
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+
+
+async def verify_admin(request: Request, user_id: str = Depends(get_current_user)):
+    """
+    Перевіряє, чи належить користувач до групи 'Admin' у Cognito.
+    """
+    token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Token missing")
+
+    try:
+        payload = jwt.decode(token, options={"verify_signature": False})
+
+        groups = payload.get("cognito:groups", [])
+
+        if "admin" not in [g.lower() for g in groups]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: Admins only"
+            )
+
+    except Exception:
+        raise HTTPException(status_code=403, detail="Could not verify admin role")
+
+    return user_id

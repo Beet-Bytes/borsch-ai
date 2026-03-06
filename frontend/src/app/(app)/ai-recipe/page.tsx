@@ -45,6 +45,7 @@ export default function AIRecipePage() {
     handleClear,
     removeIngredient,
     handleGenerateRecipes,
+    updateIngredientItem,
   } = useAIRecipe();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -180,6 +181,7 @@ export default function AIRecipePage() {
               <div className={styles.ingredientsList}>
                 {editableIngredients.map((item, index) => (
                   <div key={index} className={styles.ingredientItem}>
+                    {/* 1. Шапка з назвою і кнопками */}
                     <div className={styles.ingredientHeader}>
                       <span className={styles.ingredientName}>{item.ingredient}</span>
                       <div className={styles.itemActions}>
@@ -199,6 +201,24 @@ export default function AIRecipePage() {
                         </button>
                       </div>
                     </div>
+
+                    {/* 2. НОВИЙ БЛОК: Кількість та одиниці виміру */}
+                    <div className={styles.quantityRow}>
+                      <input
+                        type="number"
+                        className={styles.qtyInput}
+                        value={item.quantity || ''}
+                        onChange={(e) =>
+                          updateIngredientItem(index, 'quantity', Number(e.target.value))
+                        }
+                        min="0.1"
+                        step="any"
+                        placeholder="1"
+                      />
+                      <span className={styles.unitText}>{item.unit || 'pcs'}</span>
+                    </div>
+
+                    {/* 3. Смуга впевненості (Confidence) - ТІЛЬКИ ОДНА */}
                     <div className={styles.confidenceWrapper}>
                       <div className={styles.confidenceBar}>
                         <div
@@ -322,7 +342,7 @@ export default function AIRecipePage() {
                     <div
                       key={prod.id}
                       className={styles.searchResultItem}
-                      onClick={() => saveIngredient(prod.name)}
+                      onClick={() => saveIngredient(prod.name, prod.default_unit)}
                     >
                       <span className={styles.searchResultName}>{prod.name}</span>
                       <span className={styles.searchResultCat}>{prod.category}</span>
