@@ -1,7 +1,7 @@
-const API = process.env.NEXT_PUBLIC_API_URL;
+import { apiFetch } from './apiClient';
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API}${path}`, { credentials: 'include', ...options });
+  const res = await apiFetch(path, options);
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail ?? data.message ?? 'Something went wrong');
   return data as T;

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/app/services/auth';
+import { getLegalStatus, postConsent } from '@/app/services/legal';
 
 export function useLogin() {
   const router = useRouter();
@@ -21,6 +22,17 @@ export function useLogin() {
     setLoading(true);
     try {
       await login(email, password);
+      // Record consent for all active legal documents
+      try {
+        const status = await getLegalStatus();
+        await Promise.all(
+          Object.entries(status).map(([docType, version]) =>
+            postConsent(docType, version as string)
+          )
+        );
+      } catch {
+        // Non-critical — consent can be re-recorded later via CONSENT_REQUIRED flow
+      }
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

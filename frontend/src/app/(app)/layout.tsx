@@ -11,11 +11,12 @@ import {
 } from 'lucide-react';
 import { Navbar } from '@/app/components/ui/Navbar/Navbar';
 import { FoodDecor } from '@/app/components/ui/FoodDecor/FoodDecor';
+import { ConsentProvider } from './providers/ConsentProvider';
 import styles from './layout.module.css';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <ConsentProvider>
       <Navbar
         logo={
           <Link href="/dashboard" style={{ textDecoration: 'none' }}>
@@ -60,6 +61,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <FoodDecor className={styles.page}>
         <main className={styles.main}>{children}</main>
       </FoodDecor>
-    </>
+    </ConsentProvider>
   );
 }
