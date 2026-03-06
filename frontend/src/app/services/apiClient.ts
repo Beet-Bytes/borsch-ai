@@ -13,6 +13,13 @@ export class ConsentRequiredError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  constructor() {
+    super('Unauthorized');
+    this.name = 'UnauthorizedError';
+  }
+}
+
 // Registered by ConsentProvider — resolves when user has accepted consent
 type ConsentHandler = (missing: MissingDoc[]) => Promise<void>;
 let consentHandler: ConsentHandler | null = null;
@@ -23,6 +30,13 @@ export function registerConsentHandler(handler: ConsentHandler) {
 
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const res = await fetch(`${API}${path}`, { credentials: 'include', ...init });
+
+  if (res.status === 401) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    throw new UnauthorizedError();
+  }
 
   if (res.status === 451) {
     const data = await res.clone().json();
