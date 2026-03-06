@@ -12,12 +12,16 @@ pillow_heif.register_heif_opener()
 
 load_dotenv()
 
+# Отримуємо змінні для R2
+R2_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
+BUCKET_NAME = os.getenv("R2_BUCKET")
+
+# Створюємо сесію з ключами R2
 session = aioboto3.Session(
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_REGION"),
+    aws_access_key_id=os.getenv("R2_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("R2_SECRET_ACCESS_KEY"),
+    region_name="auto",
 )
-BUCKET_NAME = os.getenv("AWS_S3_BUCKET")
 
 USER_AVATARS_FOLDER = "user-avatars"
 ALLOWED_IMAGE_TYPES = [
@@ -37,10 +41,6 @@ AVATAR_SIZE = (500, 500)
 
 
 # -------------------- Сервис для завантаження аватара --------------------
-# Приймає файл користувача
-# Перевіряє тип і розмір
-# Оптимізує зображення
-# Завантажує у S3
 async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     if not file or not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded or filename missing")
@@ -60,7 +60,6 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
 
     try:
         image = Image.open(io.BytesIO(content))
-
         image = ImageOps.exif_transpose(image)
 
         width, height = image.size
@@ -72,7 +71,6 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
         bottom = (height + new_size) / 2
 
         image = image.crop((left, top, right, bottom))
-
         image = image.resize(AVATAR_SIZE, Image.Resampling.LANCZOS)
 
         if image.mode not in ("RGB", "RGBA"):
@@ -91,7 +89,8 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
     file_key = f"{USER_AVATARS_FOLDER}/{user_id}_{uuid4()}.{extension}"
 
     try:
-        async with session.client("s3") as s3_client:
+        # ОБОВ'ЯЗКОВО: додаємо endpoint_url=R2_ENDPOINT_URL
+        async with session.client("s3", endpoint_url=R2_ENDPOINT_URL) as s3_client:
             await s3_client.put_object(
                 Bucket=BUCKET_NAME,
                 Key=file_key,
@@ -99,21 +98,21 @@ async def upload_avatar_to_s3(file: UploadFile, user_id: str):
                 ContentType=content_type,
             )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error uploading file to S3: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error uploading file to R2: {str(e)}")
 
-    region = os.getenv("AWS_REGION")
-    url = f"https://{BUCKET_NAME}.s3.{region}.amazonaws.com/{file_key}"
+    # Прибрали amazonaws, тепер формуємо універсальний або внутрішній URL
+    url = f"{R2_ENDPOINT_URL}/{BUCKET_NAME}/{file_key}"
     return url, file_key
 
 
 # -------------------- Сервис для отримання аватара з S3 --------------------
-# Завантажує файл за file_key та повертає bytes
 async def get_avatar_bytes_from_s3(file_key: str) -> bytes:
     try:
-        async with session.client("s3") as s3_client:
+        # ОБОВ'ЯЗКОВО: додаємо endpoint_url=R2_ENDPOINT_URL
+        async with session.client("s3", endpoint_url=R2_ENDPOINT_URL) as s3_client:
             response = await s3_client.get_object(Bucket=BUCKET_NAME, Key=file_key)
             return await response["Body"].read()
     except Exception as e:
-        if "NoSuchKey" in str(e):
+        if "NoSuchKey" in str(e) or "Not Found" in str(e):
             raise HTTPException(status_code=404, detail="Avatar not found")
-        raise HTTPException(status_code=500, detail=f"S3 Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"R2 Error: {str(e)}")

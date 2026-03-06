@@ -14,6 +14,7 @@ import {
   KeyRound,
   X,
   Save,
+  Loader2,
 } from 'lucide-react';
 import { PageWrapper } from '@/app/components/ui/PageWrapper/PageWrapper';
 import { Card } from '@/app/components/ui/Card/Card';
@@ -46,8 +47,20 @@ const ACTIVITY_OPTIONS = [
 ];
 
 export default function ProfilePage() {
-  const { form, set, isDirty, loading, saving, error, handleSave, handleCancel, handleLogout } =
-    useProfile();
+  const {
+    form,
+    set,
+    isDirty,
+    loading,
+    saving,
+    error,
+    handleSave,
+    handleCancel,
+    handleLogout,
+    fileInputRef,
+    handleAvatarUpload,
+    avatarUploading, // Витягуємо нові пропси
+  } = useProfile();
 
   if (loading) {
     return (
@@ -63,15 +76,46 @@ export default function ProfilePage() {
         {/* Personal Information */}
         <Card title="Personal Information" icon={<User size={20} />}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatar}>
-              {form.fullName ? form.fullName[0].toUpperCase() : <User size={24} />}
+            <div className={styles.avatar} style={{ overflow: 'hidden', position: 'relative' }}>
+              {/* Відображення аватара або плейсхолдера */}
+              {form.avatarUrl ? (
+                <img
+                  src={form.avatarUrl}
+                  alt="Avatar"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : form.fullName ? (
+                form.fullName[0].toUpperCase()
+              ) : (
+                <User size={24} />
+              )}
             </div>
+
             <div className={styles.avatarInfo}>
               <p className={styles.avatarName}>{form.fullName || '—'}</p>
-              <Button variant="secondary" size="sm">
-                <Camera size={14} />
-                Change Photo
+
+              {/* Кнопка та прихований інпут */}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+              >
+                {avatarUploading ? (
+                  <Loader2 size={14} className={styles.spinner} />
+                ) : (
+                  <Camera size={14} />
+                )}
+                {avatarUploading ? 'Uploading...' : 'Change Photo'}
               </Button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarUpload}
+                accept="image/jpeg, image/png, image/webp"
+                style={{ display: 'none' }}
+              />
             </div>
           </div>
           <div className={styles.grid}>

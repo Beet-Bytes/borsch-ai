@@ -54,3 +54,18 @@ export async function updateProfile(data: {
     body: JSON.stringify(data),
   });
 }
+
+export async function uploadAvatar(file: File): Promise<{ avatar_url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API}/profile/avatar`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail ?? data.message ?? 'Upload failed');
+  return data;
+}

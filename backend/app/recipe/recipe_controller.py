@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.recipe.recipe_schemas import (
     RecipeCreateSchema,
@@ -6,15 +6,18 @@ from app.recipe.recipe_schemas import (
     RecipeSearchResponse,
     RecipeUpdateSchema,
     RecipeUpdateSchemaOptional,
+    RecommendRequestSchema,
     UpdateRecipeResponse,
 )
 from app.recipe.recipe_service import (
     create_recipe,
     get_recipe,
+    recommend_recipes,
     search_recipes_by_ingredient_name,
     update_recipe,
     update_recipe_optional,
 )
+from app.user.authorization.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
@@ -264,3 +267,19 @@ async def search_recipes(name: str):
 )
 async def get_recipe_by_id(recipe_id: str):
     return await get_recipe(recipe_id)
+
+
+# -------------------- POST /recipes/recommend --------------------
+@router.post(
+    "/recommend",
+    response_model=RecipeSearchResponse,
+    summary="Recommend recipes based on ingredients",
+    description="Returns top recipes based on ingredient overlap and filters out user's hard constraints (e.g., allergies).",
+)
+async def get_recommendations(
+    data: RecommendRequestSchema, user_id: str = Depends(get_current_user)
+):
+    if not data.ingredients:
+        raise HTTPException(status_code=400, detail="Ingredient list cannot be empty")
+
+    return await recommend_recipes(user_id, data.ingredients)

@@ -9,6 +9,7 @@ from app.recipe.recipe_schemas import (
     RecipeUpdateSchema,
     RecipeUpdateSchemaOptional,
 )
+from app.user.profile.profile_service import get_user_profile
 
 
 # -------------------- Допоміжна функція для "плоского" словника --------------------
@@ -189,3 +190,80 @@ async def get_recipe(recipe_id: str):
             ing["_id"] = str(ing["_id"])
 
     return recipe
+
+
+# -------------------- Рекомендація рецептів (Rule-Based + Constraints) --------------------
+async def recommend_recipes(user_id: str, available_ingredients: list[str]):
+    # 1. Отримуємо профіль і жорсткі обмеження
+    user_profile = await get_user_profile(user_id)
+    constraints = user_profile.get("hard_constraints", {})
+
+    # Нормалізуємо алергії для зручного пошуку
+    allergies = [a.lower() for a in constraints.get("allergies", [])]
+
+    # TODO: add recommendation system base on ml_vector
+
+    # 2. Витягуємо всі рецепти, зджойнивши продукти, щоб бачити їхні назви
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "products",
+                "localField": "ingredients._id",
+                "foreignField": "_id",
+                "as": "product_docs",
+            }
+        }
+    ]
+
+    cursor = db.recipes.aggregate(pipeline)
+    all_recipes = await cursor.to_list(length=None)  # Для невеликої БД це ок
+
+    avail_ing_lower = [ing.lower() for ing in available_ingredients]
+    recommended = []
+
+    for recipe in all_recipes:
+        recipe_products = [p.get("name", "").lower() for p in recipe.get("product_docs", [])]
+
+        # --- Перевірка Hard Constraints (Алергії) ---
+        has_allergy = False
+        for rp in recipe_products:
+            # Якщо хоча б одне слово-алерген є в назві продукту
+            if any(alrg in rp for alrg in allergies):
+                has_allergy = True
+                break
+
+        if has_allergy:
+            continue  # Пропускаємо цей рецепт, він небезпечний для юзера
+
+        # --- Скоринг (Співпадіння інгредієнтів) ---
+        match_count = 0
+        for rp in recipe_products:
+            # Частковий збіг (напр. "tomato" у "cherry tomato" або навпаки)
+            if any(rp in avail or avail in rp for avail in avail_ing_lower):
+                match_count += 1
+
+        # Рахуємо відсоток співпадіння (щоб рецепт з 2 інгредієнтів, де є 2 збіги, був вище,
+        # ніж рецепт з 20 інгредієнтів, де є ті ж 2 збіги)
+        total_ingredients = len(recipe_products) if recipe_products else 1
+        match_percentage = match_count / total_ingredients
+
+        # Залишаємо лише ті рецепти, де є хоча б один збіг
+        if match_count > 0:
+            recipe["match_percentage"] = match_percentage
+            recipe["matched_ingredients_count"] = match_count
+
+            # Чистимо сміття перед відправкою на фронт
+            del recipe["product_docs"]
+            recipe["_id"] = str(recipe["_id"])
+            for ing in recipe.get("ingredients", []):
+                if "_id" in ing and isinstance(ing["_id"], ObjectId):
+                    ing["_id"] = str(ing["_id"])
+
+            recommended.append(recipe)
+
+    # 3. Сортуємо: спочатку найвищий відсоток співпадіння, потім найбільша кількість збігів
+    recommended.sort(
+        key=lambda x: (x["match_percentage"], x["matched_ingredients_count"]), reverse=True
+    )
+
+    return {"recipes": recommended[:15]}  # Повертаємо Топ-15
