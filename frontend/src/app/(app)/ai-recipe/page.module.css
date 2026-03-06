@@ -530,3 +530,57 @@
   margin-top: auto;
   width: 100%;
 }
+
+/* --- Нові стилі для кількості та одиниць --- */
+.quantityRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.qtyInput {
+  background: rgba(0, 0, 0, 0.2); /* Темний фон, як у пошуку */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Твій стандартний бордер */
+  color: var(--text-heading); /* Світлий текст */
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.qtyInput {
+  width: 70px;
+  text-align: center;
+}
+
+/* Прибираємо стандартні стрілочки в інпуті для цифр */
+.qtyInput::-webkit-outer-spin-button,
+.qtyInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qtyInput[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.qtyInput:focus {
+  border-color: var(--color-primary-500);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.unitText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-body);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  user-select: none;
+}

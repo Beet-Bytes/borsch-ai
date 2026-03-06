@@ -46,46 +46,50 @@ async def scan_fridge(file: UploadFile = File(...), user_id: str = Depends(verif
         cursor = db.products.find({"ai_label": {"$in": ai_labels}})
         matching_products = await cursor.to_list(length=None)
 
-        label_to_name = {
-            p.get("ai_label"): p.get("name") for p in matching_products if p.get("ai_label")
+        label_to_info = {
+            p.get("ai_label"): {
+                "name": p.get("name"),
+                # Беремо default_unit з БД. Якщо його там ще немає,
+                # ставимо 'pcs' (бо камера зазвичай бачить штучні об'єкти: яблука, буряк тощо)
+                "unit": p.get("default_unit", "pcs"),
+            }
+            for p in matching_products
+            if p.get("ai_label")
         }
 
         for item in ingredients:
             original_label = item["ingredient"]
-
             item["ai_label"] = original_label
 
-            if original_label in label_to_name:
-                item["ingredient"] = label_to_name[original_label]
+            if original_label in label_to_info:
+                item["ingredient"] = label_to_info[original_label]["name"]
+                item["unit"] = label_to_info[original_label]["unit"]
             else:
                 item["ingredient"] = original_label.replace("_", " ").capitalize()
+                item["unit"] = "pcs"
 
     return data
 
 
-@router.post("/generate", summary="Save to R2, save feedback, and generate recipes")
+@router.post("/generate", summary="Save to R2, save feedback, and recommend recipes from DB")
 async def generate_recipes(
     file: UploadFile = File(...),
     original_items: str = Form(..., description="JSON array of original AI items"),
-    final_items: str = Form(..., description="JSON array of final user items"),
+    final_items: str = Form(..., description="JSON array of final user items with quantities"),
     user_id: str = Depends(get_current_user),
-    # Залишаємо Depends для захисту роуту (щоб генерували тільки авторизовані)
 ):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="The file must be an image")
 
     file_bytes = await file.read()
-
-    # 1. Завантажуємо фото в R2 АНОНІМНО (без user_id)
     scan_id = await upload_fridge_scan_to_s3(file_bytes)
 
     try:
         original_list = json.loads(original_items)
-        final_list = json.loads(final_items)
+        final_list = json.loads(final_items)  # Тепер це масив об'єктів!
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON format for items")
 
-    # 3. Зберігаємо АНОНІМНИЙ фідбек (без поля user_id)
     correction_doc = {
         "scan_id": scan_id,
         "original_ai_items": original_list,
@@ -94,12 +98,78 @@ async def generate_recipes(
     }
     await db.ai_corrections.insert_one(correction_doc)
 
-    # 4. ТУТ БУДЕ ЛОГІКА ЗВЕРНЕННЯ ДО LLM
-    # recipes = await llm_service.generate(final_list)
+    # 3. ШУКАЄМО РЕЦЕПТИ З УРАХУВАННЯМ ПЕРЕДАНИХ КОРИСТУВАЧЕМ ЗНАЧЕНЬ
+    user_inventory_by_name = {}
+    for item in final_list:
+        # Безпечно витягуємо дані (раптом прийде старий формат)
+        if isinstance(item, str):
+            name, qty, unit = item, 1.0, "pcs"
+        else:
+            name = item.get("name", "")
+            qty = float(item.get("quantity", 1.0))
+            unit = item.get("unit", "pcs").lower()
+
+        if name in user_inventory_by_name:
+            user_inventory_by_name[name]["quantity"] += qty
+        else:
+            user_inventory_by_name[name] = {"quantity": qty, "unit": unit}
+
+    ingredient_names = list(user_inventory_by_name.keys())
+    recommended_recipes = []
+
+    if ingredient_names:
+        cursor = db.products.find({"name": {"$in": ingredient_names}})
+        products = await cursor.to_list(length=None)
+
+        # Словник { "ID_продукту": {"quantity": 400, "unit": "g"} }
+        user_inventory_by_id = {str(p["_id"]): user_inventory_by_name[p["name"]] for p in products}
+
+        if user_inventory_by_id:
+            recipes_cursor = db.recipes.find(
+                {"ingredients._id": {"$in": list(user_inventory_by_id.keys())}}
+            )
+            recipes = await recipes_cursor.to_list(length=None)
+
+            for recipe in recipes:
+                recipe_ingredients = recipe.get("ingredients", [])
+                if not recipe_ingredients:
+                    continue
+
+                match_score = 0.0
+                matched_count = 0
+
+                for req_item in recipe_ingredients:
+                    req_id = req_item.get("_id")
+                    req_qty = req_item.get("quantity", 1)
+
+                    user_item = user_inventory_by_id.get(req_id)
+
+                    if user_item and user_item["quantity"] > 0:
+                        matched_count += 1
+                        user_qty = user_item["quantity"]
+
+                        # Ділимо те що є, на те, що потрібно.
+                        # Якщо рецепт хоче 400г цукру, а юзер вказав 100г, score буде 0.25
+                        item_score = min(1.0, user_qty / req_qty) if req_qty > 0 else 1.0
+                        match_score += item_score
+
+                total_count = len(recipe_ingredients)
+                match_percentage = match_score / total_count if total_count > 0 else 0
+
+                recipe["_id"] = str(recipe["_id"])
+                recipe["match_percentage"] = match_percentage
+                recipe["matched_ingredients_count"] = matched_count
+
+                recommended_recipes.append(recipe)
+
+            recommended_recipes.sort(
+                key=lambda x: (x["match_percentage"], x["matched_ingredients_count"]), reverse=True
+            )
 
     return {
         "status": "success",
         "scan_id": scan_id,
-        "message": "Data saved cleanly and anonymously. Ready to generate recipes!",
+        "message": "Recipes found successfully!",
         "ingredients_used": final_list,
+        "recipes": recommended_recipes,
     }

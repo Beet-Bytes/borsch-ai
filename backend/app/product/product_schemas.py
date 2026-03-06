@@ -16,6 +16,7 @@ class NutritionPer100gSchema(BaseModel):
 class ProductCreateSchema(BaseModel):
     name: str
     category: str
+    default_unit: str  # Додано
     nutrition_per_100g: NutritionPer100gSchema
 
 
@@ -23,6 +24,7 @@ class ProductCreateSchema(BaseModel):
 class ProductUpdateSchema(BaseModel):
     name: str
     category: str
+    default_unit: str  # Додано
     nutrition_per_100g: NutritionPer100gSchema
 
 
@@ -30,6 +32,7 @@ class ProductUpdateSchema(BaseModel):
 class ProductUpdateSchemaOptional(BaseModel):
     name: Optional[str] = None
     category: Optional[str] = None
+    default_unit: Optional[str] = None  # Додано
     nutrition_per_100g: Optional[NutritionPer100gSchema] = None
 
 
@@ -37,6 +40,7 @@ class ProductUpdateSchemaOptional(BaseModel):
 class ProductResponseSchema(BaseModel):
     name: str
     category: str
+    default_unit: str  # Додано
     nutrition_per_100g: NutritionPer100gSchema
     created_at: datetime
     updated_at: datetime
@@ -54,3 +58,4 @@ class ProductSearchResponseSchema(BaseModel):
     id: str
     name: str
     category: str
+    default_unit: str = "g"

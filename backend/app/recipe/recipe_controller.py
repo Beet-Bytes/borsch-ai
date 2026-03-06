@@ -158,13 +158,7 @@ async def update_recipe_partial(recipe_id: str, data: RecipeUpdateSchemaOptional
                                 "difficulty": "easy",
                                 "number_of_servings": 2,
                                 "utensils": ["Pan", "Spatula"],
-                                "ingredients": [
-                                    {
-                                        "_id": "69a08f6f28e5eb9ad7ae9034",
-                                        "quantity": 3,
-                                        "unit": "pcs",
-                                    }
-                                ],
+                                "ingredients": [{"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 3}],
                                 "steps": [
                                     {"step_number": 1, "instruction": "Crack eggs into bowl."}
                                 ],
@@ -228,8 +222,8 @@ async def search_recipes(name: str):
                         "number_of_servings": 1,
                         "utensils": ["Pot", "Spoon", "Bowl", "Knife", "Cutting board"],
                         "ingredients": [
-                            {"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 50, "unit": "g"},
-                            {"_id": "69a08f6f28e5eb9ad7ae9035", "quantity": 200, "unit": "ml"},
+                            {"_id": "69a08f6f28e5eb9ad7ae9034", "quantity": 50},
+                            {"_id": "69a08f6f28e5eb9ad7ae9035", "quantity": 200},
                         ],
                         "steps": [
                             {"step_number": 1, "instruction": "Put oat flakes into a pot."},

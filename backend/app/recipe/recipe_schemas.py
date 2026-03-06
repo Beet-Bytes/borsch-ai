@@ -18,7 +18,7 @@ class RecipeIngredientSchema(BaseModel):
 
     id: str = Field(alias="_id")
     quantity: float = Field(..., ge=0)
-    unit: str
+    # Поле unit ПОВНІСТЮ ВИДАЛЕНО
 
 
 # -------------------- Крок рецепту --------------------
@@ -38,8 +38,8 @@ class RecipeCreateSchema(BaseModel):
     ingredients: List[RecipeIngredientSchema] = Field(
         ...,
         example=[
-            {"_id": "69a08f6f28e5eb9ad7ae9045", "quantity": 130, "unit": "g"},
-            {"_id": "69a08f6f28e5eb9ad7ae9046", "quantity": 50, "unit": "g"},
+            {"_id": "69a08f6f28e5eb9ad7ae9045", "quantity": 130},  # Видалено unit з прикладу
+            {"_id": "69a08f6f28e5eb9ad7ae9046", "quantity": 50},  # Видалено unit з прикладу
         ],
     )
     steps: List[RecipeStepSchema]
